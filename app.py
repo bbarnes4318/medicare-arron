@@ -662,23 +662,23 @@ def view_leads():
         flash(f'Error loading leads: {e}', 'error')
         return redirect(url_for('dashboard'))
 
-@app.route('/launch-browser', methods=['POST'])
+@app.route('/download-client')
 @login_required
-def launch_browser_route():
-    """Launch the local proxy browser"""
+def download_client():
+    """Download the client-side proxy browser launcher"""
     try:
-        # Run the launcher script in a separate process
-        # We use Popen so it doesn't block the Flask server
-        subprocess.Popen([sys.executable, 'launch_browser.py'])
-        return jsonify({
-            'success': True,
-            'message': 'Proxy Browser launched! Look for the new Chrome window.'
-        })
+        # Ensure package exists
+        if not os.path.exists('proxy_browser_client.zip'):
+            import package_client
+            package_client.create_client_package()
+            
+        return send_file('proxy_browser_client.zip',
+                        as_attachment=True,
+                        download_name='proxy_browser_client.zip')
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        })
+        flash(f'Error downloading client: {e}', 'error')
+        return redirect(url_for('dashboard'))
+
 
     except Exception as e:
         print(f"❌ Error saving lead from extension: {e}")

@@ -112,6 +112,56 @@ if __name__ == "__main__":
     # 1. Start Proxy
     start_proxy_server()
     
+    # 1.5 Configure API URL (for DigitalOcean support)
+    config_file = "api_config.txt"
+    api_url = "http://localhost:5000"
+    
+    if os.path.exists(config_file):
+        with open(config_file, "r") as f:
+            api_url = f.read().strip()
+            print(f"ℹ️  Using saved API URL: {api_url}")
+    else:
+        print("\n" + "="*60)
+        print("🌐 API CONFIGURATION (First Run Only)")
+        print("="*60)
+        print("Where is your app hosted?")
+        print("1. Localhost (default)")
+        print("2. DigitalOcean / Remote Server")
+        choice = input("Enter 1 or 2: ").strip()
+        
+        if choice == "2":
+            url = input("Enter your App URL (e.g., https://myapp.ondigitalocean.app): ").strip()
+            if url:
+                # Remove trailing slash
+                if url.endswith('/'):
+                    url = url[:-1]
+                api_url = url
+                with open(config_file, "w") as f:
+                    f.write(api_url)
+                print("✅ Configuration saved!")
+        else:
+            print("✅ Using localhost.")
+            with open(config_file, "w") as f:
+                f.write(api_url)
+
+    # Update extension/content.js with the correct URL
+    content_js_path = os.path.join("extension", "content.js")
+    if os.path.exists(content_js_path):
+        try:
+            with open(content_js_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            # Replace localhost or previous URL with new API URL
+            # We look for the fetch call
+            import re
+            new_content = re.sub(r'fetch\("https?://[^"]+/api/save-lead"', f'fetch("{api_url}/api/save-lead"', content)
+            
+            with open(content_js_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"✅ Extension configured to send data to: {api_url}")
+        except Exception as e:
+            print(f"⚠️  Warning: Could not update extension configuration: {e}")
+
     # 2. Launch Browser
     launch_browser()
     

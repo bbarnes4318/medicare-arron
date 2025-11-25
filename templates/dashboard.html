@@ -302,11 +302,11 @@
       <div class="card">
         <h2>🎯 Quick Actions</h2>
         <div class="quick-actions">
-                <div class="action-card" onclick="launchBrowser()" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
-                    <h3>🚀</h3>
-                    <h3>Launch Proxy Browser</h3>
-                    <p>Open Chrome with Proxy</p>
-                </div>
+                <a href="{{ url_for('download_client') }}" class="action-card" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                    <h3>📥</h3>
+                    <h3>Download Launcher</h3>
+                    <p>Get the app for your PC</p>
+                </a>
                 <a href="{{ url_for('submit_form') }}" class="action-card">
                     <h3>📋</h3>
                     <h3>Submit Form</h3>
