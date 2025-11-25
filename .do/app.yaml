@@ -1,0 +1,54 @@
+name: medicare-form-portal
+region: nyc
+
+services:
+  - name: web
+    github:
+      repo: bbarnes4318/medicare-form
+      branch: main
+      deploy_on_push: true
+    
+    source_dir: /
+    
+    http_port: 8080
+    
+    environment_slug: python
+    
+    run_command: gunicorn --worker-tmp-dir /dev/shm --config gunicorn_config.py app:app
+    
+    envs:
+      - key: PORT
+        value: "8080"
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PROXY_HOST
+        value: "us.decodo.com"
+      - key: PROXY_PORT
+        value: "10000"
+      - key: PROXY_USERNAME
+        value: "sp12ay6sup"
+      - key: PROXY_PASSWORD
+        value: "3mo2E1_R0ksylXqdmN"
+      - key: GOOGLE_SHEETS_CREDENTIALS_JSON
+        value: "SET_IN_DIGITALOCEAN_DASHBOARD"
+      - key: GOOGLE_SHEETS_SPREADSHEET_ID
+        value: "1l48px8Sj9JiqbfW8aLgMeWMMGAVYQFjbKnZWZkVmDCE"
+      - key: GOOGLE_SHEETS_WORKSHEET_NAME
+        value: "medicare-form"
+      - key: LANDING_PAGE_URL
+        value: "https://lowinsurancecost.com"
+      - key: LANDING_PAGE_FORM_ENDPOINT
+        value: ""
+    
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    # Memory optimization - reduced workers
+    envs:
+      - key: GUNICORN_WORKERS
+        value: "1"
+    
+    health_check:
+      http_path: /health
+

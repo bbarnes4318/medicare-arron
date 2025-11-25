@@ -8,13 +8,33 @@ import base64
 import re
 import random
 import string
-from urllib.parse import urlparse
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# IPRoyal Configuration
+PROXY_HOST = os.getenv("IPROYAL_HOST", "geo.iproyal.com")
+PROXY_PORT = int(os.getenv("IPROYAL_PORT", "12321"))
+PROXY_USER = os.getenv("IPROYAL_USER")
+
+# Debug/Safety Check
+if not PROXY_USER:
+    print("="*60)
+    print("❌ ERROR: IPROYAL_USER not found in .env file!")
+    print("   Please ensure you have created the .env file with your credentials.")
+    print("   Format: IPROYAL_USER=your_username")
+    print("="*60)
+
+def get_random_session_id(length=8):
+    """Generate a random session ID for IP rotation"""
+    letters = string.ascii_lowercase + string.digits
+    return ''.join(random.choice(letters) for i in range(length))
+
 # Generate a fresh session ID for this run
 SESSION_ID = get_random_session_id()
-SESSION_ID = get_random_session_id()
+
 # Construct password with session ID if not provided directly
 # IPRoyal format: password_country-us_city-lasvegas_session-ID_lifetime-168h
 base_pass = os.getenv("IPROYAL_PASS_BASE")
