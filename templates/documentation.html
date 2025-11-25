@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Proxy Access Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .card p, .card li {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📚 Documentation</h1>
+        <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>🚀 Getting Started</h2>
+            <p>
+                Welcome to the Proxy Access Portal! This documentation will help you integrate our IPRoyal proxy service
+                into your applications and scripts.
+            </p>
+            
+            <div class="info-box">
+                <strong>ℹ️ Proxy Information</strong><br>
+                <strong>Host:</strong> {{ proxy_config.host }}<br>
+                <strong>Port:</strong> {{ proxy_config.port }}<br>
+                <strong>Location:</strong> {{ proxy_config.country }}<br>
+                <strong>Rotation:</strong> {{ proxy_config.rotation }}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🐍 Python Usage Examples</h2>
+            
+            <h3>Basic Example with Requests Library</h3>
+            <p>This is the simplest way to use the proxy with Python's <code>requests</code> library:</p>
+            
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>import requests
+
+# Proxy configuration
+proxy_url = 'http://{{ proxy_config.username }}:{{ proxy_config.password }}@{{ proxy_config.host }}:{{ proxy_config.port }}'
+
+proxies = {
+    'http': proxy_url,
+    'https': proxy_url
+}
+
+# Make a request
+url = 'https://ipv4.icanhazip.com'
+response = requests.get(url, proxies=proxies, timeout=10)
+
+print(f"Your IP address: {response.text.strip()}")
+print(f"Status code: {response.status_code}")</pre>
+            </div>
+
+            <h3>Complete Script with Error Handling</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>import requests
+
+# Proxy credentials
+PROXY_HOST = "{{ proxy_config.host }}"
+PROXY_PORT = {{ proxy_config.port }}
+PROXY_USER = "{{ proxy_config.username }}"
+PROXY_PASS = "{{ proxy_config.password }}"
+
+# Construct proxy URL
+proxy_url = f'http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}:{PROXY_PORT}'
+proxies = {
+    'http': proxy_url,
+    'https': proxy_url
+}
+
+def make_request(url, method='GET', **kwargs):
+    """Make a request through the proxy"""
+    try:
+        if method.upper() == 'GET':
+            response = requests.get(url, proxies=proxies, timeout=10, **kwargs)
+        elif method.upper() == 'POST':
+            response = requests.post(url, proxies=proxies, timeout=10, **kwargs)
+        else:
+            raise ValueError(f"Unsupported method: {method}")
+        
+        response.raise_for_status()
+        return response
+    
+    except requests.exceptions.ProxyError as e:
+        print(f"Proxy Error: {e}")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
+        return None
+
+# Example usage
+if __name__ == "__main__":
+    # Test the proxy
+    response = make_request('https://ipv4.icanhazip.com')
+    if response:
+        print(f"✅ Success! Your proxy IP: {response.text.strip()}")
+    
+    # Make a GET request to an API
+    response = make_request('https://api.github.com/users/github')
+    if response:
+        print(f"✅ API Response: {response.status_code}")
+        print(response.json())</pre>
+            </div>
+
+            <h3>Using with Sessions (Recommended for Multiple Requests)</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>import requests
+
+# Create a session with proxy configuration
+session = requests.Session()
+proxy_url = 'http://{{ proxy_config.username }}:{{ proxy_config.password }}@{{ proxy_config.host }}:{{ proxy_config.port }}'
+session.proxies = {
+    'http': proxy_url,
+    'https': proxy_url
+}
+
+# Make multiple requests using the same session
+urls = [
+    'https://ipv4.icanhazip.com',
+    'https://api.ipify.org',
+    'https://ifconfig.me/ip'
+]
+
+for url in urls:
+    try:
+        response = session.get(url, timeout=10)
+        print(f"IP from {url}: {response.text.strip()}")
+    except Exception as e:
+        print(f"Error: {e}")</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🌐 Other Languages</h2>
+            
+            <h3>JavaScript/Node.js (using axios)</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>const axios = require('axios');
+const HttpsProxyAgent = require('https-proxy-agent');
+
+const proxyUrl = 'http://{{ proxy_config.username }}:{{ proxy_config.password }}@{{ proxy_config.host }}:{{ proxy_config.port }}';
+const agent = new HttpsProxyAgent(proxyUrl);
+
+axios.get('https://ipv4.icanhazip.com', {
+    httpsAgent: agent,
+    httpAgent: agent
+})
+.then(response => {
+    console.log('Your IP:', response.data.trim());
+})
+.catch(error => {
+    console.error('Error:', error.message);
+});</pre>
+            </div>
+
+            <h3>cURL Command Line</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>curl -x {{ proxy_config.host }}:{{ proxy_config.port }} \
+     -U {{ proxy_config.username }}:{{ proxy_config.password }} \
+     https://ipv4.icanhazip.com</pre>
+            </div>
+
+            <h3>PHP (using cURL)</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>&lt;?php
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "https://ipv4.icanhazip.com");
+curl_setopt($ch, CURLOPT_PROXY, "{{ proxy_config.host }}:{{ proxy_config.port }}");
+curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{{ proxy_config.username }}:{{ proxy_config.password }}");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+$response = curl_exec($ch);
+echo "Your IP: " . trim($response);
+curl_close($ch);
+?&gt;</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💡 Best Practices</h2>
+            
+            <div class="success-box">
+                <strong>✅ DO:</strong>
+                <ul>
+                    <li>Use sessions for multiple requests to improve performance</li>
+                    <li>Implement proper error handling for proxy failures</li>
+                    <li>Set reasonable timeouts (10-30 seconds recommended)</li>
+                    <li>Keep your credentials secure and never commit them to public repositories</li>
+                    <li>Use environment variables for credentials in production</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ DON'T:</strong>
+                <ul>
+                    <li>Share your proxy credentials with unauthorized users</li>
+                    <li>Hardcode credentials in your source code</li>
+                    <li>Make excessive requests that might violate terms of service</li>
+                    <li>Forget to handle connection errors and timeouts</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔧 Environment Variables Setup</h2>
+            <p>For production use, store credentials as environment variables:</p>
+            
+            <h3>Linux/Mac (.bashrc or .zshrc)</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>export PROXY_HOST="{{ proxy_config.host }}"
+export PROXY_PORT="{{ proxy_config.port }}"
+export PROXY_USER="{{ proxy_config.username }}"
+export PROXY_PASS="{{ proxy_config.password }}"</pre>
+            </div>
+
+            <h3>Python Script Using Environment Variables</h3>
+            <div class="code-block">
+                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <pre>import os
+import requests
+
+# Load from environment variables
+proxy_host = os.getenv('PROXY_HOST')
+proxy_port = os.getenv('PROXY_PORT')
+proxy_user = os.getenv('PROXY_USER')
+proxy_pass = os.getenv('PROXY_PASS')
+
+proxy_url = f'http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}'
+proxies = {'http': proxy_url, 'https': proxy_url}
+
+response = requests.get('https://ipv4.icanhazip.com', proxies=proxies)
+print(response.text.strip())</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🆘 Troubleshooting</h2>
+            
+            <h3>Common Issues and Solutions</h3>
+            
+            <div class="info-box">
+                <strong>Problem: ProxyError or Connection Timeout</strong><br>
+                <strong>Solution:</strong>
+                <ul>
+                    <li>Check your internet connection</li>
+                    <li>Verify credentials are correct</li>
+                    <li>Increase timeout value (e.g., <code>timeout=30</code>)</li>
+                    <li>Ensure firewall isn't blocking outbound connections</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <strong>Problem: Authentication Failed (407 Error)</strong><br>
+                <strong>Solution:</strong>
+                <ul>
+                    <li>Double-check username and password</li>
+                    <li>Make sure password includes the country specifier: <code>_country-us</code></li>
+                    <li>Verify credentials haven't been changed</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <strong>Problem: SSL Certificate Errors</strong><br>
+                <strong>Solution:</strong>
+                <ul>
+                    <li>Update your SSL certificates: <code>pip install --upgrade certifi</code></li>
+                    <li>As a last resort (not recommended for production): <code>verify=False</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📞 Support</h2>
+            <p>
+                If you need additional help or have questions about using the proxy service,
+                please contact your system administrator or refer to the
+                <a href="{{ url_for('credentials') }}" style="color: #667eea;">credentials page</a>
+                for the latest proxy information.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
+
