@@ -74,37 +74,87 @@ LANDING_PAGE_URL = os.environ.get('LANDING_PAGE_URL', 'https://lowinsurancecost.
 LANDING_PAGE_FORM_ENDPOINT = os.environ.get('LANDING_PAGE_FORM_ENDPOINT', '')  # e.g., '/submit' or '/form-handler'
 
 # Database Configuration
-DB_NAME = 'leads.db'
+# Use absolute path to ensure we're writing to the expected location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, 'leads.db')
 
 def init_db():
     """Initialize the SQLite database"""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS leads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT,
-            first_name TEXT,
-            last_name TEXT,
-            phone TEXT,
-            email TEXT,
-            address TEXT,
-            city TEXT,
-            state TEXT,
-            zip_code TEXT,
-            trustedform_cert_url TEXT,
-            source TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
-    print(f"✅ Database {DB_NAME} initialized")
+    try:
+        print(f"🔄 Initializing database at {DB_NAME}...")
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS leads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                first_name TEXT,
+                last_name TEXT,
+                phone TEXT,
+                email TEXT,
+                address TEXT,
+                city TEXT,
+                state TEXT,
+                zip_code TEXT,
+                trustedform_cert_url TEXT,
+                source TEXT
+            )
+        ''')
+        conn.commit()
+        conn.close()
+        print(f"✅ Database initialized successfully at {DB_NAME}")
+        
+        # Verify table exists
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='leads'")
+        if c.fetchone():
+            print("✅ Table 'leads' verified to exist")
+        else:
+            print("❌ CRITICAL: Table 'leads' does not exist after initialization!")
+        conn.close()
+        
+    except Exception as e:
+        print(f"❌ CRITICAL ERROR initializing database: {e}")
 
 # Initialize DB on module load (for Gunicorn)
 try:
     init_db()
 except Exception as e:
-    print(f"Warning: Could not initialize database: {e}")
+    print(f"Warning: Could not initialize database on module load: {e}")
+
+@app.route('/debug-db')
+def debug_db():
+    """Debug endpoint to check database status"""
+    try:
+        if not os.path.exists(DB_NAME):
+            return jsonify({'status': 'error', 'message': f'Database file not found at {DB_NAME}'})
+            
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        
+        # Check table
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='leads'")
+        table_exists = c.fetchone() is not None
+        
+        # Count rows
+        row_count = 0
+        if table_exists:
+            c.execute("SELECT COUNT(*) FROM leads")
+            row_count = c.fetchone()[0]
+            
+        conn.close()
+        
+        return jsonify({
+            'status': 'ok',
+            'db_path': DB_NAME,
+            'table_exists': table_exists,
+            'row_count': row_count,
+            'file_size': os.path.getsize(DB_NAME),
+            'permissions': oct(os.stat(DB_NAME).st_mode)[-3:]
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
 
 def save_lead_to_db(data):
     """Save lead data to SQLite database"""
