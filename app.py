@@ -722,6 +722,9 @@ def submit_form():
         if not trustedform_url:
             trustedform_url = ''
         
+        # Save to Local Database
+        save_lead_to_db(form_data)
+        
         # Submit form through proxy
         submission_result = submit_form_through_proxy(form_data, trustedform_url)
         
