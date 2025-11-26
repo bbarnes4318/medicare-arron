@@ -100,6 +100,12 @@ def init_db():
     conn.close()
     print(f"✅ Database {DB_NAME} initialized")
 
+# Initialize DB on module load (for Gunicorn)
+try:
+    init_db()
+except Exception as e:
+    print(f"Warning: Could not initialize database: {e}")
+
 def save_lead_to_db(data):
     """Save lead data to SQLite database"""
     try:
