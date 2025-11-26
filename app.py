@@ -698,7 +698,7 @@ def save_lead_api():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/submit-form', methods=['GET', 'POST'])
-@login_required
+
 def submit_form():
     """Form submission page for agents"""
     if request.method == 'GET':

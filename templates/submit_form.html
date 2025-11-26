@@ -212,15 +212,19 @@
     <div class="navbar">
         <h1>📋 Form Submission Portal</h1>
         <div class="navbar-right">
+            {% if username %}
             <div class="user-info">
                 Welcome, <strong>{{ username }}</strong>
             </div>
             <button class="logout-btn" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+            {% endif %}
         </div>
     </div>
 
     <div class="container">
+        {% if username %}
         <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+        {% endif %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
