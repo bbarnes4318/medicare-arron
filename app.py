@@ -334,26 +334,11 @@ def submit_form_through_proxy(form_data, trustedform_url):
     try:
         # Determine the form submission endpoint
         # Angular apps often submit to API endpoints like /api/submit, /api/leads, etc.
-        if LANDING_PAGE_FORM_ENDPOINT:
-            submit_url = f"{LANDING_PAGE_URL}{LANDING_PAGE_FORM_ENDPOINT}"
-        else:
-            # Try common Angular/API endpoints automatically
-            # We'll try multiple common patterns and see which one works
-            common_endpoints = [
-                '/api/submit',
-                '/api/leads',
-                '/api/form-submit',
-                '/submit',
-                '/api/contact',
-                '/api/lead',
-                '/form-submit',
-                '',  # Try base URL last (Angular routing)
-            ]
-            # Start with the first endpoint - we'll try others if this fails
-            submit_url = f"{LANDING_PAGE_URL}{common_endpoints[0]}"
+        # Target the specific Google Apps Script endpoint provided by the user
+        submit_url = "https://script.google.com/macros/s/AKfycbxCiqJ9BN_fT5DnFFKrVW3jv3uER-jIqW4_lqzjx_o5F3avNZhFX3cPGxB6UF87lMGM/exec"
         
-        # Prepare form data matching landing page field names
-        # The landing page uses Angular form controls, so we match those exact names
+        # Prepare form data matching the exact payload structure provided
+        # The target expects multipart/form-data
         payload = {
             'state': form_data.get('state', ''),
             'zip_code': form_data.get('zip_code', ''),
@@ -361,50 +346,45 @@ def submit_form_through_proxy(form_data, trustedform_url):
             'last_name': form_data.get('last_name', ''),
             'phone': form_data.get('phone', ''),
             'email': form_data.get('email', ''),
-            'disclosure': 'true' if form_data.get('disclosure') else '',  # TCPA consent checkbox
+            'leadid_token': str(uuid.uuid4()).upper(), # Generate if not provided
+            'ip': '99.38.204.249', # This will likely be overwritten by the script seeing the proxy IP, but we send it anyway
         }
         
-        # Add LeadID token (hidden field from landing page)
-        # Generate a UUID format similar to the landing page
-        leadid_token = str(uuid.uuid4()).upper()
-        payload['universal_leadid'] = leadid_token
+        # Handle TrustedForm
+        if trustedform_url:
+            payload['xxTrustedFormToken_0'] = trustedform_url
         
-        # Add TrustedForm fields ONLY if we have a valid certificate from client-side JavaScript
-        # The landing page likely has its own TrustedForm implementation, so we only include
-        # these fields if the client-side JavaScript provided a real certificate
-        if trustedform_url and trustedform_url.startswith('https://cert.trustedform.com/'):
-            payload['xxTrustedFormCertUrl'] = trustedform_url
-            payload['xxTrustedFormToken'] = trustedform_url
-            # Generate ping URL (TrustedForm ping URL format)
-            ping_url = trustedform_url.replace('cert.trustedform.com', 'ping.trustedform.com')
-            payload['xxTrustedFormPingUrl'] = ping_url
-        # If no valid TrustedForm certificate, don't include fake ones
-        # The landing page will handle TrustedForm on its own
-        
-        # Headers to mimic a real browser and Angular app
+        # Headers - mimic the browser request
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json, text/plain, */*',  # Angular apps typically accept JSON
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': 'application/json',  # Try JSON first (Angular apps often use JSON)
-            'Origin': LANDING_PAGE_URL,
-            'Referer': f'{LANDING_PAGE_URL}/',
-            'X-Requested-With': 'XMLHttpRequest',  # Indicates AJAX request
+            'Origin': 'https://lowinsurancecost.com',
+            'Referer': 'https://lowinsurancecost.com/',
         }
         
-        # Try multiple endpoints and submission formats
-        # Angular apps can use different endpoints and formats
-        common_endpoints = [
-            LANDING_PAGE_FORM_ENDPOINT if LANDING_PAGE_FORM_ENDPOINT else '/api/submit',
-            '/api/leads',
-            '/api/form-submit',
-            '/submit',
-            '/api/contact',
-            '/api/lead',
-            '/form-submit',
-            '',  # Base URL (Angular routing)
-        ]
+        print(f"DEBUG: Submitting to {submit_url}")
+        
+        # Use requests.post with 'data' to send multipart/form-data (requests handles the boundary automatically)
+        response = requests.post(
+            submit_url,
+            data=payload,
+            headers=headers,
+            proxies=proxies,
+            timeout=15,
+            verify=False # Google scripts sometimes have cert issues with proxies, but usually fine.
+        )
+        
+        print(f"DEBUG: Response Status: {response.status_code}")
+        
+        # Google Scripts often return 302 Redirect on success, or 200 with HTML
+        if response.status_code in [200, 201, 302]:
+            return {
+                'success': True,
+                'proxy_ip': proxies.get('http', '').split('@')[-1].split(':')[0] if proxies else 'Unknown'
+            }
+        else:
+             # Fallback: If the specific URL fails, we can't really try others since this is a very specific script.
+             pass
+
         
         response = None
         last_error = None
