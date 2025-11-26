@@ -727,6 +727,9 @@ def submit_form():
         # If no TrustedForm URL, use empty string (not None) so Google Sheets doesn't break
         if not trustedform_url:
             trustedform_url = ''
+            
+        # Add to form_data for local DB saving
+        form_data['trustedform_cert_url'] = trustedform_url
         
         # Save to Local Database
         save_lead_to_db(form_data)
