@@ -163,6 +163,40 @@ def init_db():
     except Exception as e:
         print(f"❌ CRITICAL ERROR initializing database: {e}")
 
+    # Attempt schema migrations (add missing columns if table exists)
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        # List of columns to check/add
+        columns_to_add = [
+            ('disclosure', 'TEXT'),
+            ('trustedform_cert_url', 'TEXT'),
+            ('trustedform_token', 'TEXT'),
+            ('trustedform_ping_url', 'TEXT'),
+            ('source', 'TEXT')
+        ]
+        
+        for col_name, col_type in columns_to_add:
+            try:
+                if DATABASE_URL:
+                    c.execute(f"ALTER TABLE leads ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                else:
+                    # SQLite doesn't support IF NOT EXISTS in ADD COLUMN
+                    # So we try and ignore error
+                    try:
+                        c.execute(f"ALTER TABLE leads ADD COLUMN {col_name} {col_type}")
+                    except sqlite3.OperationalError:
+                        pass # Column likely exists
+            except Exception as e:
+                print(f"Migration warning for {col_name}: {e}")
+                
+        conn.commit()
+        conn.close()
+        print("✅ Database schema migration checks completed")
+    except Exception as e:
+        print(f"❌ Error during schema migration: {e}")
+
 # Initialize DB on module load (for Gunicorn)
 try:
     init_db()
@@ -221,8 +255,8 @@ def save_lead_to_db(data):
             INSERT INTO leads (
                 timestamp, first_name, last_name, phone, email, 
                 address, city, state, zip_code, trustedform_cert_url, 
-                trustedform_token, trustedform_ping_url, source
-            ) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
+                trustedform_token, trustedform_ping_url, source, disclosure
+            ) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
         '''
         
         c.execute(query, (
@@ -230,7 +264,7 @@ def save_lead_to_db(data):
             data.get('first_name', ''),
             data.get('last_name', ''),
             data.get('phone', ''),
-            data.get('email', ''), # Kept for schema compatibility, but will be empty from form
+            data.get('email', ''), # Kept for schema compatibility
             data.get('address', ''),
             data.get('city', ''),
             data.get('state', ''),
@@ -238,7 +272,8 @@ def save_lead_to_db(data):
             data.get('trustedform_cert_url', ''),
             data.get('trustedform_token', ''),
             data.get('trustedform_ping_url', ''),
-            'Extension Capture'
+            data.get('source', 'Extension Capture'), # Use provided source or default
+            data.get('disclosure', 'No')
         ))
         
         conn.commit()
@@ -855,9 +890,9 @@ def submit_form():
             trustedform_url = ''
             
         # Add to form_data for local DB saving and passing to other functions
-        form_data['trustedform_cert_url'] = trustedform_url
         form_data['trustedform_token'] = trustedform_token
         form_data['trustedform_ping_url'] = trustedform_ping_url
+        form_data['source'] = 'Web Form' # Explicitly set source
         
         # Save to Local Database
         save_lead_to_db(form_data)
