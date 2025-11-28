@@ -37,6 +37,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
+
 # Proxy configuration for Decodo residential proxies
 # Use environment variables for production deployment
 PROXY_CONFIG = {
@@ -895,6 +896,14 @@ def submit_form():
     except Exception as e:
         flash(f'An error occurred: {str(e)}', 'error')
         return redirect(url_for('submit_form'))
+
+# Initialize database on startup (ensure tables exist)
+# This is critical for production where __main__ is not executed
+# We do this at the module level so it runs when Gunicorn imports the app
+try:
+    init_db()
+except Exception as e:
+    print(f"Warning: Database initialization failed on startup: {e}")
 
 if __name__ == '__main__':
     # Create templates directory if it doesn't exist
