@@ -23,44 +23,13 @@
       <img src="https://api.trustedform.com/ns.gif" />
     </noscript>
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-
-</head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <body>
     <div class="navbar">
-        <h1>📋 Form Submission Portal</h1>
+        <h1>Medicare Form Portal</h1>
         <div class="navbar-right">
-            {% if username %}
-            <div class="user-info">
-                Welcome, <strong>{{ username }}</strong>
-            </div>
             <button class="logout-btn" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
-            {% endif %}
         </div>
     </div>
 

@@ -9,12 +9,8 @@
   </head>
   <body>
     <div class="navbar">
-      <h1>🚀 Proxy Access Portal</h1>
+      <h1>Medicare Form Portal</h1>
       <div class="navbar-right">
-        <div class="user-info">
-          Welcome, <strong>{{ username }}</strong><br />
-          <small>Logged in: {{ login_time }}</small>
-        </div>
         <button
           class="logout-btn"
           onclick="window.location.href='{{ url_for('logout') }}';"
@@ -30,27 +26,6 @@
       <div class="alert alert-{{ category }}">{{ message }}</div>
       {% endfor %} {% endif %} {% endwith %}
 
-      <div class="card">
-        <h2>📊 Proxy Service Status</h2>
-        <div class="proxy-info">
-          <div class="info-item">
-            <div class="info-label">Proxy Host</div>
-            <div class="info-value">{{ proxy_config.host }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Port</div>
-            <div class="info-value">{{ proxy_config.port }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Location</div>
-            <div class="info-value">{{ proxy_config.country }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">IP Rotation</div>
-            <div class="info-value">{{ proxy_config.rotation }}</div>
-          </div>
-        </div>
-      </div>
 
 
       <div class="card">
