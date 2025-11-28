@@ -4,8 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Form - Proxy Portal</title>
-    <!-- TrustedForm Script - Required for generating valid certificates -->
-    <script type="text/javascript" src="https://api.trustedform.com/trustedform.js"></script>
+    <!-- TrustedForm Script - Specific for this campaign -->
+    <script type="text/javascript">
+      (function () {
+        var tf = document.createElement("script");
+        tf.type = "text/javascript";
+        tf.async = true;
+        tf.src =
+          ("https:" == document.location.protocol ? "https" : "http") +
+          "://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping_field=xxTrustedFormPingUrl&l=" +
+          new Date().getTime() +
+          Math.random();
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(tf, s);
+      })();
+    </script>
+    <noscript>
+      <img src="https://api.trustedform.com/ns.gif" />
+    </noscript>
+    
     <style>
         * {
             margin: 0;
@@ -273,6 +290,11 @@
                     </label>
                 </div>
 
+                <!-- TrustedForm Hidden Fields -->
+                <input type="hidden" name="xxTrustedFormCertUrl" id="xxTrustedFormCertUrl_0">
+                <input type="hidden" name="xxTrustedFormToken" id="xxTrustedFormToken_0">
+                <input type="hidden" name="xxTrustedFormPingUrl" id="xxTrustedFormPingUrl_0">
+
                 <button type="submit" class="submit-btn" id="submitBtn">
                     Submit Form
                 </button>
@@ -286,14 +308,9 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Submitting through proxy...';
             
-            // Get TrustedForm certificate if available
-            if (typeof TrustedForm !== 'undefined' && TrustedForm.certUrl) {
-                const tfInput = document.createElement('input');
-                tfInput.type = 'hidden';
-                tfInput.name = 'trustedform_cert_url';
-                tfInput.value = TrustedForm.certUrl;
-                this.appendChild(tfInput);
-            }
+            // Note: TrustedForm script automatically populates the hidden fields with IDs:
+            // xxTrustedFormCertUrl_0, xxTrustedFormToken_0, xxTrustedFormPingUrl_0
+            // We don't need to manually populate them if the IDs match what the script expects.
         });
     </script>
 </body>
