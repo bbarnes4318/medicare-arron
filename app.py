@@ -795,6 +795,17 @@ def view_leads():
             
         c.execute('SELECT * FROM leads ORDER BY timestamp DESC')
         leads = c.fetchall()
+        
+        # Debug: Print first lead to check keys
+        if leads:
+            first_lead = leads[0]
+            # Convert to dict for printing if it's a Row object
+            if isinstance(first_lead, sqlite3.Row):
+                print(f"DEBUG: First lead keys: {first_lead.keys()}")
+                print(f"DEBUG: First lead values: {dict(first_lead)}")
+            else:
+                print(f"DEBUG: First lead: {first_lead}")
+                
         conn.close()
         return render_template('leads.html', leads=leads, username=session.get('username'))
     except Exception as e:
@@ -890,6 +901,7 @@ def submit_form():
             trustedform_url = ''
             
         # Add to form_data for local DB saving and passing to other functions
+        form_data['trustedform_cert_url'] = trustedform_url
         form_data['trustedform_token'] = trustedform_token
         form_data['trustedform_ping_url'] = trustedform_ping_url
         form_data['source'] = 'Web Form' # Explicitly set source
