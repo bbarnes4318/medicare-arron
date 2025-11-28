@@ -110,7 +110,6 @@
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Email</th>
-                        <th>Address</th>
                         <th>City/State/Zip</th>
                         <th>TrustedForm</th>
                     </tr>
@@ -123,7 +122,6 @@
                         <td>{{ lead.first_name }} {{ lead.last_name }}</td>
                         <td>{{ lead.phone }}</td>
                         <td>{{ lead.email }}</td>
-                        <td>{{ lead.address }}</td>
                         <td>{{ lead.city }}, {{ lead.state }} {{ lead.zip_code }}</td>
                         <td>
                             {% if lead.trustedform_cert_url %}

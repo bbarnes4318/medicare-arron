@@ -285,47 +285,14 @@
         </div>
       </div>
 
-      <div class="card">
-        <h2>🧪 Test Proxy Connection</h2>
-        <p style="color: #666; margin-bottom: 20px">
-          Click the button below to test your proxy connection and see your
-          current IP address.
-        </p>
-
-        <button class="test-btn" id="testBtn" onclick="testProxy()">
-          Test Proxy Now
-        </button>
-
-        <div id="resultBox" class="result-box"></div>
-      </div>
 
       <div class="card">
         <h2>🎯 Quick Actions</h2>
         <div class="quick-actions">
-                <a href="{{ url_for('download_client') }}" class="action-card" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
-                    <h3>📥</h3>
-                    <h3>Download Launcher</h3>
-                    <p>Get the app for your PC</p>
-                </a>
                 <a href="{{ url_for('submit_form') }}" class="action-card">
                     <h3>📋</h3>
                     <h3>Submit Form</h3>
                     <p>Submit form through proxy</p>
-                </a>
-                <a href="{{ url_for('credentials') }}" class="action-card">
-                    <h3>🔑</h3>
-                    <h3>Credentials</h3>
-                    <p>View proxy credentials</p>
-                </a>
-                <a href="{{ url_for('documentation') }}" class="action-card">
-                    <h3>📚</h3>
-                    <h3>Documentation</h3>
-                    <p>Usage examples & code</p>
-                </a>
-                <a href="#" onclick="testProxy(); return false;" class="action-card">
-                    <h3>🧪</h3>
-                    <h3>Test Connection</h3>
-                    <p>Verify proxy status</p>
                 </a>
                 <a href="{{ url_for('view_leads') }}" class="action-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
                     <h3>👥</h3>
