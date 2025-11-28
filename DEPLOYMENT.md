@@ -110,6 +110,8 @@ If you need to add environment variables:
 2. Click "Settings" → "App-Level Environment Variables"
 3. Add variables like:
    - `SECRET_KEY` - Custom secret key for Flask
+   - `DATABASE_URL` - **REQUIRED** for data persistence. Use the connection string provided by your DigitalOcean Database.
+     - Example: `postgresql://doadmin:PASSWORD@HOST:PORT/defaultdb?sslmode=require`
    - Custom user credentials (if you want to avoid hardcoding)
 
 ### Scaling

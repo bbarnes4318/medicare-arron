@@ -12,6 +12,8 @@ import re
 import subprocess
 import sys
 import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 
 # Load environment variables from .env file if it exists
@@ -77,42 +79,85 @@ LANDING_PAGE_FORM_ENDPOINT = os.environ.get('LANDING_PAGE_FORM_ENDPOINT', '')  #
 # Use absolute path to ensure we're writing to the expected location
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = os.path.join(BASE_DIR, 'leads.db')
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+def get_db_connection():
+    """Get database connection (Postgres or SQLite)"""
+    if DATABASE_URL:
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            return conn
+        except Exception as e:
+            print(f"❌ Error connecting to PostgreSQL: {e}")
+            # Fallback to SQLite if Postgres fails (e.g. locally without env var)
+            return sqlite3.connect(DB_NAME)
+    else:
+        return sqlite3.connect(DB_NAME)
 
 def init_db():
-    """Initialize the SQLite database"""
+    """Initialize the database (Postgres or SQLite)"""
     try:
-        print(f"🔄 Initializing database at {DB_NAME}...")
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS leads (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TEXT,
-                first_name TEXT,
-                last_name TEXT,
-                phone TEXT,
-                email TEXT,
-                address TEXT,
-                city TEXT,
-                state TEXT,
-                zip_code TEXT,
-                trustedform_cert_url TEXT,
-                source TEXT
-            )
-        ''')
-        conn.commit()
-        conn.close()
-        print(f"✅ Database initialized successfully at {DB_NAME}")
-        
-        # Verify table exists
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='leads'")
-        if c.fetchone():
-            print("✅ Table 'leads' verified to exist")
+        if DATABASE_URL:
+            print("🔄 Initializing PostgreSQL database...")
+            conn = psycopg2.connect(DATABASE_URL)
+            c = conn.cursor()
+            # Postgres syntax
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS leads (
+                    id SERIAL PRIMARY KEY,
+                    timestamp TEXT,
+                    first_name TEXT,
+                    last_name TEXT,
+                    phone TEXT,
+                    email TEXT,
+                    address TEXT,
+                    city TEXT,
+                    state TEXT,
+                    zip_code TEXT,
+                    trustedform_cert_url TEXT,
+                    trustedform_token TEXT,
+                    trustedform_ping_url TEXT,
+                    source TEXT
+                )
+            ''')
+            conn.commit()
+            conn.close()
+            print("✅ PostgreSQL database initialized successfully")
         else:
-            print("❌ CRITICAL: Table 'leads' does not exist after initialization!")
-        conn.close()
+            print(f"🔄 Initializing SQLite database at {DB_NAME}...")
+            conn = sqlite3.connect(DB_NAME)
+            c = conn.cursor()
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS leads (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT,
+                    first_name TEXT,
+                    last_name TEXT,
+                    phone TEXT,
+                    email TEXT,
+                    address TEXT,
+                    city TEXT,
+                    state TEXT,
+                    zip_code TEXT,
+                    trustedform_cert_url TEXT,
+                    trustedform_token TEXT,
+                    trustedform_ping_url TEXT,
+                    source TEXT
+                )
+            ''')
+            conn.commit()
+            conn.close()
+            print(f"✅ Database initialized successfully at {DB_NAME}")
+            
+            # Verify table exists
+            conn = sqlite3.connect(DB_NAME)
+            c = conn.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='leads'")
+            if c.fetchone():
+                print("✅ Table 'leads' verified to exist")
+            else:
+                print("❌ CRITICAL: Table 'leads' does not exist after initialization!")
+            conn.close()
         
     except Exception as e:
         print(f"❌ CRITICAL ERROR initializing database: {e}")
@@ -157,29 +202,41 @@ def debug_db():
         return jsonify({'status': 'error', 'error': str(e)})
 
 def save_lead_to_db(data):
-    """Save lead data to SQLite database"""
+    """Save lead data to database (Postgres or SQLite)"""
     try:
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()
         c = conn.cursor()
         
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        c.execute('''
+        # Use generic placeholder %s for Postgres, ? for SQLite
+        # But psycopg2 supports %s and sqlite3 supports ?
+        # We need to handle this difference
+        
+        is_postgres = DATABASE_URL is not None
+        placeholder = '%s' if is_postgres else '?'
+        
+        query = f'''
             INSERT INTO leads (
                 timestamp, first_name, last_name, phone, email, 
-                address, city, state, zip_code, trustedform_cert_url, source
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
+                address, city, state, zip_code, trustedform_cert_url, 
+                trustedform_token, trustedform_ping_url, source
+            ) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
+        '''
+        
+        c.execute(query, (
             timestamp,
             data.get('first_name', ''),
             data.get('last_name', ''),
             data.get('phone', ''),
-            data.get('email', ''),
+            data.get('email', ''), # Kept for schema compatibility, but will be empty from form
             data.get('address', ''),
             data.get('city', ''),
             data.get('state', ''),
             data.get('zip_code', ''),
             data.get('trustedform_cert_url', ''),
+            data.get('trustedform_token', ''),
+            data.get('trustedform_ping_url', ''),
             'Extension Capture'
         ))
         
@@ -689,9 +746,17 @@ def documentation():
 def view_leads():
     """View captured leads"""
     try:
-        conn = sqlite3.connect(DB_NAME)
-        conn.row_factory = sqlite3.Row  # Access columns by name
-        c = conn.cursor()
+        conn = get_db_connection()
+        
+        # Handle row factory differences
+        if DATABASE_URL:
+            # Postgres
+            c = conn.cursor(cursor_factory=RealDictCursor)
+        else:
+            # SQLite
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            
         c.execute('SELECT * FROM leads ORDER BY timestamp DESC')
         leads = c.fetchall()
         conn.close()
