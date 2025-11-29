@@ -41,7 +41,7 @@
         /* Header */
         header {
             background: white;
-            padding: 20px 0;
+            padding: 14px 0; /* slightly tighter */
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
@@ -58,96 +58,98 @@
             height: 50px;
         }
 
-        .header-phone {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .header-inner > div {
             color: var(--navy);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 18px;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        .header-phone:hover {
-            color: var(--blue);
-        }
-
-        /* Hero */
+        /* Hero – cleaned, professional spacing */
         .hero {
             background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
             color: white;
-            padding: 80px 0;
+            padding: 80px 0 96px; /* much more generous vertical padding */
         }
 
         .hero-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
+            gap: 64px;          /* wider gap */
+            align-items: flex-start;
         }
 
         .hero h1 {
-            font-size: 48px;
+            font-size: 44px;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
+            line-height: 1.2;
+            margin-bottom: 32px;  /* much more space after headline */
         }
 
         .hero p {
-            font-size: 20px;
-            opacity: 0.95;
-            margin-bottom: 32px;
+            font-size: 19px;
+            opacity: 0.96;
+            margin-bottom: 40px;  /* much more space before features */
+            max-width: 38rem;
+            line-height: 1.65;
         }
 
         .hero-features {
             display: flex;
-            gap: 32px;
-            margin-top: 32px;
+            flex-wrap: wrap;
+            gap: 24px;  /* more space between badges */
+            margin-top: 24px;
         }
 
         .hero-feature {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 16px;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .hero-feature svg {
+            width: 22px;
+            height: 22px;
         }
 
         /* Form */
         .form-card {
             background: white;
             border-radius: 16px;
-            padding: 40px;
+            padding: 24px 26px 26px;  /* much tighter padding */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         }
 
         .form-card h3 {
-            font-size: 28px;
+            font-size: 22px;
             color: var(--gray-900);
-            margin-bottom: 8px;
+            margin-bottom: 3px;
         }
 
         .form-subtitle {
             color: var(--gray-600);
-            margin-bottom: 28px;
+            margin-bottom: 16px;
+            font-size: 13px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;  /* very tight spacing */
         }
 
         .form-label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: var(--gray-900);
+            font-size: 13px;
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 9px 11px;  /* very compact inputs */
             border: 2px solid #e5e7eb;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             font-family: inherit;
             transition: all 0.2s;
         }
@@ -160,21 +162,21 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 14px;
         }
 
         .consent {
             background: #f9fafb;
-            padding: 16px;
+            padding: 10px;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 12px 0 14px;  /* minimal space */
         }
 
         .consent label {
             display: flex;
-            gap: 12px;
-            font-size: 13px;
-            line-height: 1.5;
+            gap: 8px;
+            font-size: 11px;
+            line-height: 1.4;
             color: var(--gray-600);
         }
 
@@ -188,8 +190,8 @@
             background: var(--orange);
             color: white;
             border: none;
-            padding: 18px;
-            font-size: 18px;
+            padding: 13px;  /* compact button */
+            font-size: 16px;
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
@@ -447,9 +449,17 @@
 
         /* Responsive */
         @media (max-width: 968px) {
+            .hero {
+                padding: 48px 0 56px; /* also trimmed on tablet */
+            }
+
             .hero-grid {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                gap: 32px;
+            }
+
+            .hero h1 {
+                font-size: 34px;
             }
 
             .benefits-grid {
@@ -472,15 +482,31 @@
                 grid-template-columns: 1fr;
             }
 
-            .hero h1 {
-                font-size: 36px;
+            .form-card {
+                padding: 28px 24px 30px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 10px 0;
             }
 
-            .section-header h2 {
-                font-size: 32px;
+            .hero {
+                padding: 40px 0 52px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 17px;
             }
         }
     </style>
+
+    <!-- TrustedForm script (unchanged) -->
     <script type="text/javascript">
       (function() {
           var tf = document.createElement('script');
@@ -494,7 +520,7 @@
     <header>
         <div class="container header-inner">
             <img src="{{ url_for('static', filename='one-united.png') }}" alt="One United Group" class="logo">
-            <div style="color: var(--navy); font-weight: 600; font-size: 14px;">Licensed Medicare Advisors</div>
+            <div>Licensed Medicare Advisors</div>
         </div>
     </header>
 
@@ -502,7 +528,7 @@
         <div class="container">
             <div class="hero-grid">
                 <div>
-                    <h1>Compare Medicare Plans & Find the Best Coverage for 2025</h1>
+                    <h1>Compare Medicare Plans &amp; Find the Best Coverage for 2025</h1>
                     <p>Connect with licensed Medicare advisors to explore Medicare Advantage, Medicare Supplement, and Part D prescription drug plans tailored to your needs.</p>
                     
                     <div class="hero-features">
@@ -572,7 +598,7 @@
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">
-                            <span class="btn-text">See My Options →</span>
+                            <span class="btn-text">See My Options &rarr;</span>
                             <div class="spinner"></div>
                         </button>
                     </form>
@@ -625,7 +651,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <h3>Fast & Simple</h3>
+                    <h3>Fast &amp; Simple</h3>
                     <p>Get quotes in minutes, not hours. Our streamlined process makes comparing Medicare plans quick and easy.</p>
                 </div>
 
