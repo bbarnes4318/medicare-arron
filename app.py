@@ -12,12 +12,8 @@ import re
 import subprocess
 import sys
 import sqlite3
-try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
-except ImportError:
-    psycopg2 = None
-    RealDictCursor = None
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 
 # Load environment variables from .env file if it exists
@@ -676,76 +672,12 @@ def submit_form_through_proxy(form_data, trustedform_url):
             'proxy_ip': None
         }
 
-# Removed forward_to_portal function as requested
-
-
 @app.route('/')
 def index():
-    """Render the Medicare landing page"""
-    return render_template('medicare-landing2.html')
-
-# Removed /quote route as it is now the root
-
-@app.route('/privacy-policy')
-def privacy_policy():
-    """Render Privacy Policy page"""
-    return render_template('privacy.html')
-
-@app.route('/terms-of-service')
-def terms_of_service():
-    """Render Terms of Service page"""
-    return render_template('terms.html')
-
-@app.route('/do-not-sell-my-info')
-def do_not_sell():
-    """Render Do Not Sell My Info page"""
-    return render_template('do_not_sell.html')
-
-@app.route('/accessibility')
-def accessibility():
-    """Render Accessibility page"""
-    return render_template('accessibility.html')
-
-@app.route('/contact')
-def contact():
-    """Render Contact Us page"""
-    return render_template('contact.html')
-
-@app.route('/api/submit-lead', methods=['POST'])
-def submit_lead():
-    """Handle lead submission from landing page"""
-    try:
-        data = request.json
-        
-        # Basic Validation
-        required_fields = ['first_name', 'last_name', 'phone', 'zip_code', 'state']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'Missing required field: {field}'}), 400
-                
-        # Phone Validation (Simple regex)
-        phone = data.get('phone', '')
-        if not re.match(r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', phone):
-             return jsonify({'error': 'Invalid phone number format'}), 400
-
-        # Add metadata
-        data['source'] = 'Landing Page'
-        data['disclosure'] = 'Yes' if data.get('consent') else 'No' # Should be Yes if submitted
-        
-        # Save to Database
-        if save_lead_to_db(data):
-            # No external forwarding for landing page leads - they go directly to DB (View Leads page)
-            return jsonify({'success': True, 'message': 'Lead submitted successfully'})
-        else:
-            return jsonify({'error': 'Failed to save lead'}), 500
-            
-    except Exception as e:
-        print(f"Error in submit_lead: {e}")
-        return jsonify({'error': str(e)}), 500
-
-# Login route is preserved
-# Dashboard route is preserved
-
+    """Home page - redirect to login or dashboard"""
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
 
 @app.route('/health')
 def health():
