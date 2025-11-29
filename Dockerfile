@@ -21,5 +21,6 @@ COPY . .
 # Environment variables for Chrome
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV PORT=8080
+ENV CACHE_BUST=2025-11-29-v2
 
 CMD ["gunicorn", "--worker-tmp-dir", "/dev/shm", "--config", "gunicorn_config.py", "app:app"]
