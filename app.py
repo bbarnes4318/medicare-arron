@@ -27,8 +27,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import zipfile
+import os
+
 
 # Load environment variables from .env file if it exists
 try:
@@ -601,13 +605,68 @@ def submit_lead_via_browser(form_data):
     
     # Configure Proxy if available
     if PROXY_CONFIG.get('username'):
-        proxy_url = f"http://{PROXY_CONFIG['username']}:{PROXY_CONFIG['password']}@{PROXY_CONFIG['host']}:{PROXY_CONFIG['port']}"
-        # Chrome doesn't support auth proxies easily in headless without extension
-        # But we can try setting the proxy server
-        # For authenticated proxies in headless, we might need a different approach or just IP auth
-        # For now, we'll try standard proxy arg (might fail auth)
-        # chrome_options.add_argument(f'--proxy-server=http://{PROXY_CONFIG["host"]}:{PROXY_CONFIG["port"]}')
-        pass
+        # Create a dynamic extension for proxy authentication
+        # This is required because Headless Chrome doesn't support auth popups
+        plugin_file = 'proxy_auth_plugin.zip'
+        
+        manifest_json = """
+        {
+            "version": "1.0.0",
+            "manifest_version": 2,
+            "name": "Chrome Proxy",
+            "permissions": [
+                "proxy",
+                "tabs",
+                "unlimitedStorage",
+                "storage",
+                "<all_urls>",
+                "webRequest",
+                "webRequestBlocking"
+            ],
+            "background": {
+                "scripts": ["background.js"]
+            },
+            "minimum_chrome_version":"22.0.0"
+        }
+        """
+
+        background_js = """
+        var config = {
+                mode: "fixed_servers",
+                rules: {
+                  singleProxy: {
+                    scheme: "http",
+                    host: "%s",
+                    port: parseInt(%s)
+                  },
+                  bypassList: ["localhost"]
+                }
+              };
+
+        chrome.proxy.settings.set({value: config, scope: "regular"}, function() {});
+
+        function callbackFn(details) {
+            return {
+                authCredentials: {
+                    username: "%s",
+                    password: "%s"
+                }
+            };
+        }
+
+        chrome.webRequest.onAuthRequired.addListener(
+                    callbackFn,
+                    {urls: ["<all_urls>"]},
+                    ['blocking']
+        );
+        """ % (PROXY_CONFIG['host'], PROXY_CONFIG['port'], PROXY_CONFIG['username'], PROXY_CONFIG['password'])
+
+        with zipfile.ZipFile(plugin_file, 'w') as zp:
+            zp.writestr("manifest.json", manifest_json)
+            zp.writestr("background.js", background_js)
+            
+        chrome_options.add_extension(plugin_file)
+        print(f"✅ Added Proxy Auth Extension: {PROXY_CONFIG['host']}:{PROXY_CONFIG['port']}")
 
     driver = None
     try:
