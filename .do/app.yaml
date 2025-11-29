@@ -4,7 +4,7 @@ region: nyc
 services:
   - name: web
     github:
-      repo: bbarnes4318/medicare-form
+      repo: bbarnes4318/medicare-arron
       branch: main
       deploy_on_push: true
     
