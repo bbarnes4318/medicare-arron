@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | One United Group</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-navy: #0f172a;
+            --primary-blue: #1e40af;
+            --accent-orange: #f97316;
+            --accent-orange-hover: #ea580c;
+            --text-dark: #0f172a;
+            --text-gray: #475569;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --bg-gray: #f8fafc;
+            --border-light: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-gray);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--primary-navy);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-gray);
+        }
+
+        .content-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-label {
+            font-weight: 700;
+            color: var(--primary-navy);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            padding-bottom: 2rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="/">
+                <img src="{{ url_for('static', filename='one-united.png') }}" alt="One United Group" class="logo">
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <div class="content-card">
+            <h1>Contact Us</h1>
+            <p>We're here to help! If you have any questions about Medicare plans or need assistance, please reach out to us using the information below.</p>
+
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-label">Phone</span>
+                    <p>Call us toll-free at: <strong>(800) 555-0123</strong><br>
+                    Available Monday - Friday, 9am - 6pm EST</p>
+                </div>
+
+                <div class="contact-item">
+                    <span class="contact-label">Email</span>
+                    <p>support@oneunitedgroup.com</p>
+                </div>
+
+                <div class="contact-item">
+                    <span class="contact-label">Mailing Address</span>
+                    <p>One United Group<br>
+                    123 Insurance Way<br>
+                    Suite 100<br>
+                    Tampa, FL 33602</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 One United Group. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

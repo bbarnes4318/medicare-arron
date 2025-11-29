@@ -682,9 +682,34 @@ def submit_form_through_proxy(form_data, trustedform_url):
 @app.route('/')
 def index():
     """Render the Medicare landing page"""
-    return render_template('medicare_landing.html')
+    return render_template('medicare-landing2.html')
 
 # Removed /quote route as it is now the root
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    """Render Privacy Policy page"""
+    return render_template('privacy.html')
+
+@app.route('/terms-of-service')
+def terms_of_service():
+    """Render Terms of Service page"""
+    return render_template('terms.html')
+
+@app.route('/do-not-sell-my-info')
+def do_not_sell():
+    """Render Do Not Sell My Info page"""
+    return render_template('do_not_sell.html')
+
+@app.route('/accessibility')
+def accessibility():
+    """Render Accessibility page"""
+    return render_template('accessibility.html')
+
+@app.route('/contact')
+def contact():
+    """Render Contact Us page"""
+    return render_template('contact.html')
 
 @app.route('/api/submit-lead', methods=['POST'])
 def submit_lead():

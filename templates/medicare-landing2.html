@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicare Coverage Options | One United Group</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-navy: #0f172a;
+        --primary-blue: #1e40af;
+        --accent-orange: #f97316;
+        --accent-orange-hover: #ea580c;
+        --text-dark: #0f172a;
+        --text-gray: #475569;
+        --text-light: #64748b;
+        --white: #ffffff;
+        --bg-gray: #f8fafc;
+        --bg-card: #ffffff;
+        --border-light: #e2e8f0;
+        --success: #10b981;
+        --warning: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: var(--text-dark);
+        line-height: 1.6;
+        background-color: var(--bg-gray);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* CMS Required Non-Government Banner */
+      .gov-disclaimer {
+        background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+        border-bottom: 2px solid #f59e0b;
+        padding: 0.875rem;
+        text-align: center;
+        font-size: 0.875rem;
+        color: #92400e;
+        font-weight: 500;
+      }
+
+      .gov-disclaimer strong {
+        font-weight: 700;
+      }
+
+      /* Header */
+      header {
+        background: var(--white);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 0;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .logo {
+        height: 42px;
+        width: auto;
+      }
+
+      .logo-divider {
+        width: 1px;
+        height: 30px;
+        background: var(--border-light);
+      }
+
+      .medicare-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #eff6ff;
+        border-radius: 100px;
+        color: var(--primary-blue);
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .header-cta {
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .header-cta {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+      }
+
+      .header-phone {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--text-dark);
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(
+          180deg,
+          #eff6ff 0%,
+          #f1f5f9 50%,
+          var(--bg-gray) 100%
+        );
+        padding: 4rem 0 5rem;
+        position: relative;
+      }
+
+      .hero-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .trust-banner {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--white);
+        padding: 0.5rem 1rem;
+        border-radius: 100px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--text-gray);
+      }
+
+      .trust-banner svg {
+        color: var(--success);
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.025em;
+      }
+
+      @media (min-width: 768px) {
+        h1 {
+          font-size: 3.5rem;
+        }
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        line-height: 1.5;
+      }
+
+      /* Main Content Grid */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 1100px;
+        margin: -3rem auto 0;
+        position: relative;
+        z-index: 10;
+      }
+
+      @media (min-width: 992px) {
+        .main-grid {
+          grid-template-columns: 1.2fr 1fr;
+          gap: 3rem;
+        }
+      }
+
+      /* Benefits Section */
+      .benefits-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .benefits-header {
+        margin-bottom: 2rem;
+      }
+
+      .benefits-header h2 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.75rem;
+      }
+
+      .benefits-header p {
+        color: var(--text-gray);
+        font-size: 1rem;
+      }
+
+      .benefit-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        background: var(--bg-gray);
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+      }
+
+      .benefit-item:hover {
+        background: #eff6ff;
+        border-color: var(--primary-blue);
+        transform: translateX(4px);
+      }
+
+      .benefit-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--primary-navy)
+        );
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+      }
+
+      .benefit-content h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.25rem;
+      }
+
+      .benefit-content p {
+        font-size: 0.875rem;
+        color: var(--text-gray);
+        line-height: 1.4;
+      }
+
+      /* Form Card */
+      .form-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+        border: 2px solid var(--primary-blue);
+        position: relative;
+      }
+
+      .form-badge {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(
+          90deg,
+          var(--primary-blue),
+          var(--primary-navy)
+        );
+        color: var(--white);
+        padding: 0.375rem 1.25rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-top: 1rem;
+      }
+
+      .form-header h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+      }
+
+      .form-header p {
+        color: var(--text-gray);
+        font-size: 0.9375rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+      }
+
+      .form-label .required {
+        color: #ef4444;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--border-light);
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        background: var(--bg-gray);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+
+      .form-input::placeholder {
+        color: #cbd5e1;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      /* Consent Checkbox - CMS Required */
+      .consent-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+      }
+
+      .checkbox-wrapper {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .checkbox-wrapper input[type="checkbox"] {
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-blue);
+        cursor: pointer;
+      }
+
+      .checkbox-wrapper label {
+        font-size: 0.8125rem;
+        color: var(--text-gray);
+        line-height: 1.5;
+        cursor: pointer;
+      }
+
+      .checkbox-wrapper a {
+        color: var(--primary-blue);
+        text-decoration: underline;
+        font-weight: 500;
+      }
+
+      /* Submit Button */
+      .submit-btn {
+        width: 100%;
+        background: linear-gradient(
+          135deg,
+          var(--accent-orange),
+          var(--accent-orange-hover)
+        );
+        color: var(--white);
+        border: none;
+        padding: 1.125rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.45);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      /* Loading Spinner */
+      .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading .spinner {
+        display: inline-block;
+      }
+
+      .loading .btn-text {
+        display: none;
+      }
+
+      /* TPMO Disclaimer - CMS Required 12pt minimum */
+      .tpmo-disclaimer {
+        font-size: 12pt;
+        line-height: 1.6;
+        color: var(--text-gray);
+        padding: 1.5rem;
+        background: var(--bg-gray);
+        border: 1px solid var(--border-light);
+        border-radius: 10px;
+        margin-top: 2rem;
+      }
+
+      /* Security Features */
+      .security-badges {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-light);
+      }
+
+      .security-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--text-gray);
+      }
+
+      .security-item svg {
+        color: var(--success);
+      }
+
+      /* Footer */
+      footer {
+        background: var(--text-dark);
+        color: var(--white);
+        padding: 3rem 0 2rem;
+        margin-top: 5rem;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (min-width: 768px) {
+        .footer-content {
+          grid-template-columns: 2fr 1fr 1fr;
+          gap: 4rem;
+        }
+      }
+
+      .footer-brand h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .footer-brand p {
+        font-size: 0.875rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+
+      .footer-links h4 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        color: #e2e8f0;
+      }
+
+      .footer-links ul {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-links a {
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: var(--white);
+      }
+
+      .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid #334155;
+        text-align: center;
+        font-size: 0.8125rem;
+        color: #94a3b8;
+      }
+
+      .smid-number {
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 640px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .security-badges {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .benefits-card {
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+    <!-- TrustedForm Script -->
+    <script type="text/javascript">
+      (function () {
+        var tf = document.createElement("script");
+        tf.type = "text/javascript";
+        tf.async = true;
+        tf.src =
+          ("https:" == document.location.protocol ? "https" : "http") +
+          "://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping_field=xxTrustedFormPingUrl&l=" +
+          new Date().getTime() +
+          Math.random();
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(tf, s);
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- CMS Required Non-Government Disclaimer -->
+    <div class="gov-disclaimer">
+      <strong>Important Notice:</strong> One United Group is not affiliated with
+      or endorsed by the U.S. government or the federal Medicare program. This
+      is a solicitation for insurance.
+    </div>
+
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <div class="logo-section">
+            <img
+              src="{{ url_for('static', filename='one-united.png') }}"
+              alt="One United Group"
+              class="logo"
+            />
+            <div class="logo-divider"></div>
+            <div class="medicare-badge">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              Medicare Specialist
+            </div>
+          </div>
+          <div class="header-cta">
+            <div class="header-phone">
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                ></path>
+              </svg>
+              <span>Call for Free Quote</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="trust-banner">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              ></path>
+            </svg>
+            Secure • Licensed • Trusted by 50,000+ Seniors
+          </div>
+
+          <h1>Compare Medicare Plans &<br />Save on Coverage</h1>
+
+          <p class="hero-subtitle">
+            Get personalized Medicare plan recommendations from top-rated
+            carriers. Find the right coverage for your health needs and budget
+            in minutes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="main-grid">
+        <!-- Benefits Section -->
+        <div class="benefits-card">
+          <div class="benefits-header">
+            <h2>Why Choose One United Group?</h2>
+            <p>We make Medicare simple and stress-free</p>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                ></path>
+              </svg>
+            </div>
+            <div class="benefit-content">
+              <h3>Compare Multiple Plans</h3>
+              <p>
+                Access plans from leading insurance carriers all in one place.
+                No need to visit multiple websites.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                ></path>
+              </svg>
+            </div>
+            <div class="benefit-content">
+              <h3>Expert Guidance</h3>
+              <p>
+                Our licensed Medicare advisors help you understand your options
+                with no pressure or obligation.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <div class="benefit-content">
+              <h3>$0 Service Fee</h3>
+              <p>
+                Our service is completely free. We're compensated by insurance
+                companies when you enroll.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <div class="benefit-content">
+              <h3>Fast & Easy Process</h3>
+              <p>
+                Get quotes in minutes, not hours. Simple online form with
+                instant results.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-card">
+          <div class="form-badge">Limited Time Offer</div>
+
+          <div class="form-header">
+            <h3>Get Your Free Quote</h3>
+            <p>Takes less than 60 seconds</p>
+          </div>
+
+          <form id="leadForm" onsubmit="submitLead(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="first_name" class="form-label"
+                  >First Name <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  class="form-input"
+                  required
+                  placeholder="John"
+                />
+              </div>
+              <div class="form-group">
+                <label for="last_name" class="form-label"
+                  >Last Name <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  class="form-input"
+                  required
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label"
+                >Phone Number <span class="required">*</span></label
+              >
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="form-input"
+                required
+                placeholder="(555) 123-4567"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label"
+                >Email Address <span class="required">*</span></label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                required
+                placeholder="john@example.com"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="state" class="form-label"
+                  >State <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  class="form-input"
+                  required
+                  placeholder="FL"
+                />
+              </div>
+              <div class="form-group">
+                <label for="zip_code" class="form-label"
+                  >ZIP Code <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="zip_code"
+                  name="zip_code"
+                  class="form-input"
+                  required
+                  pattern="[0-9]{5}"
+                  title="Enter 5-digit ZIP code"
+                  placeholder="33101"
+                />
+              </div>
+            </div>
+
+            <div class="consent-box">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="consent" name="consent" required />
+                <label for="consent">
+                  By checking this box, I provide my express written consent to
+                  receive automated marketing calls, texts, and emails from One
+                  United Group and participating insurance carriers at the
+                  number and email provided. I understand consent is not
+                  required for purchase and I may opt out at any time. Message
+                  and data rates may apply. View our
+                  <a href="/privacy-policy">Privacy Policy</a> and
+                  <a href="/terms-of-service">Terms of Service</a>.
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span class="btn-text">Get My Free Quote →</span>
+              <div class="spinner"></div>
+            </button>
+          </form>
+
+          <!-- CMS Required TPMO Disclaimer -->
+          <div class="tpmo-disclaimer">
+            <strong>Important Disclosure:</strong> We do not offer every plan
+            available in your area. Currently we represent 10 organizations
+            which offer 125 products in your area. Please contact Medicare.gov,
+            1-800-MEDICARE (TTY: 1-877-486-2048), or your local State Health
+            Insurance Program (SHIP) to get information on all of your options.
+          </div>
+
+          <div class="security-badges">
+            <div class="security-item">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                ></path>
+              </svg>
+              <span>SSL Secured</span>
+            </div>
+            <div class="security-item">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span>HIPAA Compliant</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <h3>One United Group</h3>
+            <p>
+              Your trusted Medicare insurance partner. We're committed to
+              helping you find the right coverage at the right price. Licensed
+              in all 50 states.
+            </p>
+          </div>
+          <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#">Medicare Advantage</a></li>
+              <li><a href="#">Medicare Supplement</a></li>
+              <li><a href="#">Part D Plans</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+            </ul>
+          </div>
+          <div class="footer-links">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="/privacy-policy">Privacy Policy</a></li>
+              <li><a href="/terms-of-service">Terms of Service</a></li>
+              <li><a href="/do-not-sell-my-info">Do Not Sell My Info</a></li>
+              <li><a href="/accessibility">Accessibility</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p class="smid-number">MULTI-PLAN_LOWINSCOST2025_M</p>
+          <p>
+            © 2025 One United Group. All rights reserved. | Not connected with
+            or endorsed by the U.S. government or the federal Medicare program.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      async function submitLead(event) {
+        event.preventDefault();
+
+        const btn = document.getElementById("submitBtn");
+        btn.classList.add("loading");
+        btn.disabled = true;
+
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        // Add TrustedForm data if available
+        const tfCert = document.getElementById("xxTrustedFormCertUrl_0");
+        const tfToken = document.getElementById("xxTrustedFormToken_0");
+        const tfPing = document.getElementById("xxTrustedFormPingUrl_0");
+
+        if (tfCert) data.trustedform_cert_url = tfCert.value;
+        if (tfToken) data.trustedform_token = tfToken.value;
+        if (tfPing) data.trustedform_ping_url = tfPing.value;
+
+        // Convert checkbox to boolean
+        data.consent = !!data.consent;
+
+        try {
+          const response = await fetch("/api/submit-lead", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            // Success - Redirect to thank you page or show message
+            alert(
+              "Success! A licensed Medicare advisor will contact you shortly to discuss your options."
+            );
+            event.target.reset();
+          } else {
+            alert(
+              "Error: " +
+                (result.error || "Something went wrong. Please try again.")
+            );
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again later.");
+        } finally {
+          btn.classList.remove("loading");
+          btn.disabled = false;
+        }
+      }
+
+      // Phone number formatting
+      document.getElementById("phone").addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length >= 6) {
+          value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(
+            6,
+            10
+          )}`;
+        } else if (value.length >= 3) {
+          value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+        }
+        e.target.value = value;
+      });
+    </script>
+  </body>
+</html>
