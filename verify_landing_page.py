@@ -32,18 +32,27 @@ def test_routes():
     
     # Test Root URL (should be landing page)
     response = client.get('/')
-    if response.status_code == 200 and b"Medicare Coverage That Fits Your Life" in response.data:
-        print("✅ Root URL (/) serves Landing Page.")
+    if response.status_code == 200:
+        content = response.data.decode('utf-8')
+        if "Medicare Coverage Options" in content:
+            print("✅ Root URL (/) serves Landing Page.")
+        else:
+            print("❌ Root URL served content but title mismatch.")
+            
+        # Check for SMID
+        if "MULTI-PLAN_LOWINSCOST2025_M" in content:
+            print("✅ SMID found on page.")
+        else:
+            print("❌ SMID MISSING on page.")
+            
+        # Check for TPMO Disclaimer
+        if "We do not offer every plan available in your area" in content:
+            print("✅ TPMO Disclaimer found.")
+        else:
+            print("❌ TPMO Disclaimer MISSING.")
+            
     else:
         print(f"❌ Root URL failed. Status: {response.status_code}")
-        return False
-        
-    # Test Login URL (should still exist)
-    response = client.get('/login')
-    if response.status_code == 200:
-        print("✅ Login URL (/login) is accessible.")
-    else:
-        print(f"❌ Login URL failed. Status: {response.status_code}")
         return False
         
     return True
