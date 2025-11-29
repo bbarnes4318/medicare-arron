@@ -696,6 +696,10 @@ def submit_lead_via_browser(form_data):
             service = Service(ChromeDriverManager().install())
         except Exception as e:
             print(f"⚠️ ChromeDriverManager failed: {e}")
+            # Check for the specific NoneType error which means Chrome isn't found
+            if "'NoneType' object has no attribute 'split'" in str(e):
+                print("❌ CRITICAL: Google Chrome is not installed or not found in PATH.")
+            
             print("Trying to proceed without explicit driver installation (hoping it's in PATH)...")
             service = Service() # Try default
 
