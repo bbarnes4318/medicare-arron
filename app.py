@@ -12,8 +12,12 @@ import re
 import subprocess
 import sys
 import sqlite3
-import psycopg2
-from psycopg2.extras import RealDictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+except ImportError:
+    psycopg2 = None
+    RealDictCursor = None
 from datetime import datetime, timedelta
 
 # Load environment variables from .env file if it exists
@@ -672,12 +676,102 @@ def submit_form_through_proxy(form_data, trustedform_url):
             'proxy_ip': None
         }
 
+def forward_to_portal(data):
+    """Forward lead data to external Leads Web Portal (Google Script)"""
+    # Hardcoded URL to match the existing proxy configuration
+    portal_url = "https://script.google.com/macros/s/AKfycbxCiqJ9BN_fT5DnFFKrVW3jv3uER-jIqW4_lqzjx_o5F3avNZhFX3cPGxB6UF87lMGM/exec"
+        
+    try:
+        # Prepare payload to match exactly what the proxy sends
+        # The proxy sends: state, zip_code, first_name, last_name, phone, email, leadid_token, ip
+        # Plus TrustedForm fields if available
+        
+        payload = {
+            'state': data.get('state', ''),
+            'zip_code': data.get('zip_code', ''),
+            'first_name': data.get('first_name', ''),
+            'last_name': data.get('last_name', ''),
+            'phone': data.get('phone', ''),
+            'email': data.get('email', ''),
+            'leadid_token': str(uuid.uuid4()).upper(), # Generate new token for direct leads
+            'ip': request.remote_addr or 'Unknown',
+        }
+        
+        # Add TrustedForm if present
+        if data.get('trustedform_cert_url'):
+            payload['xxTrustedFormCertUrl'] = data.get('trustedform_cert_url')
+            payload['xxTrustedFormToken'] = data.get('trustedform_token', '')
+            payload['xxTrustedFormPingUrl'] = data.get('trustedform_ping_url', '')
+
+        # Send exact payload
+        # Note: Google Scripts often handle JSON, but the proxy uses data=payload (multipart/form-data or urlencoded)
+        # Let's try JSON first as it's cleaner, but if it fails we might need to match requests.post(..., data=payload)
+        # The proxy code uses data=payload. Let's stick to that to be safe? 
+        # Actually, let's stick to JSON for the new endpoint unless we know for sure. 
+        # Wait, the proxy code says: "The target expects multipart/form-data". 
+        # So we should use data=payload, not json=payload.
+        
+        response = requests.post(portal_url, data=payload, timeout=10)
+        
+        if response.status_code in [200, 201, 302]:
+            print(f"✅ Successfully forwarded lead to portal: {portal_url}")
+            return True
+        else:
+            print(f"❌ Failed to forward to portal. Status: {response.status_code}, Response: {response.text}")
+            return False
+    except Exception as e:
+        print(f"❌ Error forwarding to portal: {e}")
+        return False
+
 @app.route('/')
 def index():
-    """Home page - redirect to login or dashboard"""
-    if 'username' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    """Render the Medicare landing page"""
+    return render_template('medicare_landing.html')
+
+# Removed /quote route as it is now the root
+
+@app.route('/api/submit-lead', methods=['POST'])
+def submit_lead():
+    """Handle lead submission from landing page"""
+    try:
+        data = request.json
+        
+        # Basic Validation
+        required_fields = ['first_name', 'last_name', 'phone', 'email', 'zip_code', 'state']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+                
+        # Phone Validation (Simple regex)
+        phone = data.get('phone', '')
+        if not re.match(r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', phone):
+             return jsonify({'error': 'Invalid phone number format'}), 400
+
+        # Email Validation
+        email = data.get('email', '')
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            return jsonify({'error': 'Invalid email format'}), 400
+
+        # Add metadata
+        data['source'] = 'Landing Page'
+        data['disclosure'] = 'Yes' if data.get('consent') else 'No' # Should be Yes if submitted
+        
+        # Save to Database
+        if save_lead_to_db(data):
+            # Forward to Portal
+            forward_to_portal(data)
+            
+            return jsonify({'success': True, 'message': 'Lead submitted successfully'})
+        else:
+            return jsonify({'error': 'Failed to save lead'}), 500
+            
+    except Exception as e:
+        print(f"Error in submit_lead: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Login route is preserved
+# Dashboard route is preserved
+
 
 @app.route('/health')
 def health():

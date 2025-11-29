@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicare Coverage That Fits Your Life | One United Group</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --secondary-blue: #e6f0fa;
+            --accent-orange: #f97316;
+            --text-dark: #1f2937;
+            --text-gray: #4b5563;
+            --white: #ffffff;
+            --border-color: #d1d5db;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.5;
+            background-color: #f3f4f6;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            padding: 1rem 5%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            max-height: 50px;
+            width: auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003d80 100%);
+            color: var(--white);
+            padding: 3rem 5%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            opacity: 0.9;
+        }
+
+        /* Form Container */
+        .form-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: -1rem; /* Overlap hero slightly if desired, or keep separate */
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-gray);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--secondary-blue);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--accent-orange);
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #ea580c;
+        }
+
+        /* Disclaimers */
+        .disclaimer-text {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-top: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        .tpmo-disclaimer {
+            font-size: 12pt; /* CMS Requirement: at least 12pt */
+            color: var(--text-gray);
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-disclaimer {
+            font-size: 0.875rem;
+            text-align: center;
+            padding: 2rem 5%;
+            color: var(--text-gray);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .hero {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: left;
+                padding-bottom: 4rem;
+            }
+
+            .hero-content {
+                flex: 1;
+                padding-right: 2rem;
+                padding-top: 2rem;
+            }
+
+            .form-container {
+                margin-top: 0;
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+
+    <!-- TrustedForm Script -->
+    <script type="text/javascript">
+      (function() {
+          var tf = document.createElement('script');
+          tf.type = 'text/javascript'; tf.async = true;
+          tf.src = ("https:" == document.location.protocol ? 'https' : 'http') + "://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping_field=xxTrustedFormPingUrl&l=" + new Date().getTime() + Math.random();
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(tf, s);
+      })();
+    </script>
+</head>
+<body>
+
+    <header>
+        <img src="{{ url_for('static', filename='one-united.png') }}" alt="One United Group" class="logo">
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Medicare Coverage That Fits Your Life.</h1>
+            <p>Speak with a licensed agent at One United Group to compare 2025 plan options in your area.</p>
+            <p style="font-size: 0.9rem; opacity: 0.8;">Not affiliated with or endorsed by the government or the Federal Medicare program.</p>
+        </div>
+
+        <div class="form-container">
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Review Your 2025 Options</h2>
+            
+            <form id="leadForm">
+                <div class="form-group">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-input" required pattern="[0-9]{10}|[0-9]{3}-[0-9]{3}-[0-9]{4}" title="Please enter a valid 10-digit phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="state" class="form-label">State</label>
+                    <input type="text" id="state" name="state" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="zip_code" class="form-label">Zip Code</label>
+                    <input type="text" id="zip_code" name="zip_code" class="form-input" required pattern="[0-9]{5}" title="Please enter a valid 5-digit zip code">
+                </div>
+
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="consent" name="consent" required>
+                    <label for="consent">
+                        By clicking 'Get Your Quote', I provide my electronic signature and express written consent to be contacted by One United Group and its licensed insurance agents regarding Medicare Advantage and Prescription Drug Plans at the phone number provided, including wireless numbers, using automated dialing systems or pre-recorded messages. I understand consent is not a condition of purchase. Message and data rates may apply.
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">Get My Quote</button>
+
+                <div class="tpmo-disclaimer">
+                    We do not offer every plan available in your area. Currently we represent numerous organizations which offer numerous products in your area. Please contact Medicare.gov, 1-800-MEDICARE, or your local State Health Insurance Program (SHIP) to get information on all of your options.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer-disclaimer">
+        <p>&copy; 2025 One United Group. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('leadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.querySelector('.submit-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            // Capture TrustedForm data
+            // Note: trustedform.js automatically adds hidden inputs to the form, 
+            // but we need to make sure we grab them if we are doing JSON submission.
+            // If the script ran, these fields should be in the DOM.
+            // However, FormData should pick them up if they are in the form.
+            // Let's manually check for them just in case.
+            
+            // Wait a moment for TF to populate if it hasn't (though it should have by now)
+            
+            try {
+                const response = await fetch('/api/submit-lead', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Thank you! An agent will contact you shortly.');
+                    this.reset();
+                } else {
+                    alert('Error: ' + (result.error || 'Something went wrong. Please try again.'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
