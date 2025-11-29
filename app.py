@@ -470,6 +470,9 @@ def save_to_google_sheets(form_data, trustedform_url, proxy_ip=None, submission_
         
         return False
 
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 def submit_form_through_proxy(form_data, trustedform_url):
     """Submit form to landing page through Decodo residential proxy"""
     proxies = get_proxy_dict()
@@ -482,7 +485,6 @@ def submit_form_through_proxy(form_data, trustedform_url):
     
     try:
         # Determine the form submission endpoint
-        # Angular apps often submit to API endpoints like /api/submit, /api/leads, etc.
         # Target the specific Google Apps Script endpoint provided by the user
         submit_url = "https://script.google.com/macros/s/AKfycbxCiqJ9BN_fT5DnFFKrVW3jv3uER-jIqW4_lqzjx_o5F3avNZhFX3cPGxB6UF87lMGM/exec"
         
@@ -514,14 +516,26 @@ def submit_form_through_proxy(form_data, trustedform_url):
         
         print(f"DEBUG: Submitting to {submit_url}")
         
-        # Use requests.post with 'data' to send multipart/form-data (requests handles the boundary automatically)
-        response = requests.post(
+        # Configure retry strategy
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session = requests.Session()
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+
+        # Use session.post with 'data' to send multipart/form-data
+        response = session.post(
             submit_url,
             data=payload,
             headers=headers,
             proxies=proxies,
-            timeout=15,
-            verify=False # Google scripts sometimes have cert issues with proxies, but usually fine.
+            timeout=30, # Increased timeout for retries
+            verify=False # Google scripts sometimes have cert issues with proxies
         )
         
         print(f"DEBUG: Response Status: {response.status_code}")
@@ -533,91 +547,6 @@ def submit_form_through_proxy(form_data, trustedform_url):
                 'proxy_ip': proxies.get('http', '').split('@')[-1].split(':')[0] if proxies else 'Unknown'
             }
         else:
-             # Fallback: If the specific URL fails, we can't really try others since this is a very specific script.
-             pass
-
-        
-        response = None
-        last_error = None
-        
-        # Try each endpoint with both JSON and form-urlencoded
-        # Limit to first 3 endpoints to prevent timeout
-        endpoints_to_try = common_endpoints[:3]  # Only try first 3 endpoints
-        for endpoint in endpoints_to_try:
-            if endpoint:
-                test_url = f"{LANDING_PAGE_URL}{endpoint}"
-            else:
-                test_url = LANDING_PAGE_URL
-            
-            # Try JSON first (Angular apps typically use JSON)
-            try:
-                json_headers = headers.copy()
-                json_headers['Content-Type'] = 'application/json'
-                response = requests.post(
-                    test_url,
-                    json=payload,
-                    headers=json_headers,
-                    proxies=proxies,
-                    timeout=5,  # Shorter timeout to prevent worker timeout
-                    allow_redirects=True
-                )
-                print(f"DEBUG: Tried {test_url} (JSON) - Status: {response.status_code}")
-                # If we get a 200, 201, or 302, consider it successful
-                if response.status_code in [200, 201, 302]:
-                    print(f"SUCCESS: Found working endpoint: {test_url} (JSON)")
-                    submit_url = test_url  # Update submit_url to the working one
-                    break
-                else:
-                    print(f"DEBUG: Response text (first 200 chars): {response.text[:200]}")
-            except Exception as e:
-                print(f"DEBUG: Error trying {test_url} (JSON): {str(e)}")
-                last_error = e
-                pass
-            
-            # Try form-urlencoded if JSON didn't work
-            try:
-                form_headers = headers.copy()
-                form_headers['Content-Type'] = 'application/x-www-form-urlencoded'
-                response = requests.post(
-                    test_url,
-                    data=payload,
-                    headers=form_headers,
-                    proxies=proxies,
-                    timeout=5,  # Shorter timeout
-                    allow_redirects=True
-                )
-                print(f"DEBUG: Tried {test_url} (form-urlencoded) - Status: {response.status_code}")
-                # If we get a 200, 201, or 302, consider it successful
-                if response.status_code in [200, 201, 302]:
-                    print(f"SUCCESS: Found working endpoint: {test_url} (form-urlencoded)")
-                    submit_url = test_url  # Update submit_url to the working one
-                    break
-                else:
-                    print(f"DEBUG: Response text (first 200 chars): {response.text[:200]}")
-            except Exception as e:
-                print(f"DEBUG: Error trying {test_url} (form-urlencoded): {str(e)}")
-                last_error = e
-                pass
-        
-        # If all endpoints failed, check what happened
-        if response is None:
-            error_msg = str(last_error) if last_error else 'Unknown error - no response from any endpoint'
-            print(f"ERROR: All endpoints failed. Last error: {error_msg}")
-            
-            # Check for proxy-specific errors
-            if '402' in error_msg or 'Payment Required' in error_msg:
-                error_msg = 'Proxy Error: 402 Payment Required. Your Decodo proxy account may need payment or the credentials may be expired. Please check your Decodo account status and update the proxy credentials.'
-            elif 'ProxyError' in error_msg or 'proxy' in error_msg.lower():
-                error_msg = f'Proxy Connection Error: {error_msg}. Please verify your Decodo proxy credentials are correct and the account is active.'
-            
-            return {
-                'success': False,
-                'error': f'Could not find working endpoint. {error_msg}',
-                'proxy_ip': None
-            }
-        
-        # If we got a response but it's not a success status code
-        if response.status_code not in [200, 201, 302]:
             print(f"WARNING: Got response but status code is {response.status_code}")
             print(f"Response text (first 500 chars): {response.text[:500]}")
             return {
@@ -627,44 +556,17 @@ def submit_form_through_proxy(form_data, trustedform_url):
                 'proxy_ip': None
             }
         
-        
-        # Get the proxy IP that was used
-        try:
-            ip_check_response = requests.get(
-                'https://ipv4.icanhazip.com',
-                proxies=proxies,
-                timeout=10
-            )
-            proxy_ip = ip_check_response.text.strip()
-        except Exception as ip_error:
-            # Check for proxy errors when getting IP
-            if '402' in str(ip_error) or 'Payment Required' in str(ip_error):
-                proxy_ip = 'Proxy Error: 402 Payment Required - Check Decodo account'
-            elif 'ProxyError' in str(ip_error):
-                proxy_ip = 'Proxy Connection Failed - Check credentials'
-            else:
-                proxy_ip = 'Unable to determine'
-        
-        return {
-            'success': response.status_code in [200, 201, 302],
-            'status_code': response.status_code,
-            'proxy_ip': proxy_ip,
-            'response_text': response.text[:500] if response.text else '',
-            'url': response.url
-        }
-        
     except requests.exceptions.RequestException as e:
         error_msg = str(e)
+        print(f"DEBUG: Request Exception: {error_msg}")
         
         # Provide helpful error messages for common proxy issues
         if '402' in error_msg or 'Payment Required' in error_msg:
-            error_msg = 'Proxy Error: 402 Payment Required. Your Decodo proxy account may need payment or the credentials may be expired. Please check your Decodo account dashboard and ensure your account is active and has credits.'
+            error_msg = 'Proxy Error: 402 Payment Required. Your Decodo proxy account may need payment or the credentials may be expired.'
         elif 'ProxyError' in error_msg or 'proxy' in error_msg.lower():
-            error_msg = f'Proxy Connection Error: {error_msg}. Please verify your Decodo proxy credentials in app.py are correct and the account is active.'
-        elif '401' in error_msg or 'Unauthorized' in error_msg:
-            error_msg = 'Proxy Authentication Failed: Invalid username or password. Please check your Decodo proxy credentials.'
-        elif '403' in error_msg or 'Forbidden' in error_msg:
-            error_msg = 'Proxy Access Forbidden: Your Decodo account may not have permission to use this proxy or the IP may be blocked.'
+            error_msg = f'Proxy Connection Error: {error_msg}. Please verify your Decodo proxy credentials.'
+        elif 'SSLError' in error_msg:
+             error_msg = f'SSL Error connecting to Google Script: {error_msg}. Retries failed.'
         
         return {
             'success': False,
