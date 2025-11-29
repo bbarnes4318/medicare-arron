@@ -12,9 +12,23 @@ import re
 import subprocess
 import sys
 import sqlite3
-import psycopg2
-from psycopg2.extras import RealDictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    POSTGRES_AVAILABLE = True
+except ImportError:
+    POSTGRES_AVAILABLE = False
+    print("Warning: psycopg2 not installed. PostgreSQL support disabled.")
 from datetime import datetime, timedelta
+# Selenium imports
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 # Load environment variables from .env file if it exists
 try:
@@ -84,7 +98,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
     """Get database connection (Postgres or SQLite)"""
-    if DATABASE_URL:
+    if DATABASE_URL and POSTGRES_AVAILABLE:
         try:
             conn = psycopg2.connect(DATABASE_URL)
             return conn
@@ -98,7 +112,7 @@ def get_db_connection():
 def init_db():
     """Initialize the database (Postgres or SQLite)"""
     try:
-        if DATABASE_URL:
+        if DATABASE_URL and POSTGRES_AVAILABLE:
             print("🔄 Initializing PostgreSQL database...")
             conn = psycopg2.connect(DATABASE_URL)
             c = conn.cursor()
@@ -179,7 +193,7 @@ def init_db():
         
         for col_name, col_type in columns_to_add:
             try:
-                if DATABASE_URL:
+                if DATABASE_URL and POSTGRES_AVAILABLE:
                     c.execute(f"ALTER TABLE leads ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
                 else:
                     # SQLite doesn't support IF NOT EXISTS in ADD COLUMN
@@ -248,7 +262,7 @@ def save_lead_to_db(data):
         # But psycopg2 supports %s and sqlite3 supports ?
         # We need to handle this difference
         
-        is_postgres = DATABASE_URL is not None
+        is_postgres = (DATABASE_URL is not None) and POSTGRES_AVAILABLE
         placeholder = '%s' if is_postgres else '?'
         
         query = f'''
@@ -485,8 +499,8 @@ def submit_form_through_proxy(form_data, trustedform_url):
     
     try:
         # Determine the form submission endpoint
-        # Target the specific Google Apps Script endpoint provided by the user
-        submit_url = "https://script.google.com/macros/s/AKfycbxCiqJ9BN_fT5DnFFKrVW3jv3uER-jIqW4_lqzjx_o5F3avNZhFX3cPGxB6UF87lMGM/exec"
+        # Target the real URL as requested by the user
+        submit_url = "https://lowinsurancecost.com/"
         
         # Prepare form data matching the exact payload structure provided
         # The target expects multipart/form-data
@@ -573,6 +587,101 @@ def submit_form_through_proxy(form_data, trustedform_url):
             'error': error_msg,
             'proxy_ip': None
         }
+
+def submit_lead_via_browser(form_data):
+    """Submit lead by launching a headless browser on the server"""
+    print("🚀 Launching Headless Chrome for submission...")
+    
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    # Configure Proxy if available
+    if PROXY_CONFIG.get('username'):
+        proxy_url = f"http://{PROXY_CONFIG['username']}:{PROXY_CONFIG['password']}@{PROXY_CONFIG['host']}:{PROXY_CONFIG['port']}"
+        # Chrome doesn't support auth proxies easily in headless without extension
+        # But we can try setting the proxy server
+        # For authenticated proxies in headless, we might need a different approach or just IP auth
+        # For now, we'll try standard proxy arg (might fail auth)
+        # chrome_options.add_argument(f'--proxy-server=http://{PROXY_CONFIG["host"]}:{PROXY_CONFIG["port"]}')
+        pass
+
+    driver = None
+    try:
+        # Initialize Driver
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # 1. Go to Landing Page
+        target_url = "https://lowinsurancecost.com/"
+        print(f"🌐 Navigating to {target_url}...")
+        driver.get(target_url)
+        
+        # 2. Fill Form
+        print("📝 Filling form...")
+        wait = WebDriverWait(driver, 10)
+        
+        # Map fields
+        fields = {
+            'state': form_data.get('state'),
+            'zip_code': form_data.get('zip_code'),
+            'first_name': form_data.get('first_name'),
+            'last_name': form_data.get('last_name'),
+            'phone': form_data.get('phone')
+        }
+        
+        for name, value in fields.items():
+            if value:
+                elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
+                elem.clear()
+                elem.send_keys(value)
+                
+        # Checkbox
+        if form_data.get('disclosure'):
+            try:
+                chk = driver.find_element(By.NAME, 'consent')
+                if not chk.isSelected():
+                    chk.click()
+            except:
+                pass
+
+        # 3. Capture TrustedForm Cert URL (Wait for it to generate)
+        print("⏳ Waiting for TrustedForm certificate...")
+        time.sleep(3) # Give TF time to load
+        
+        cert_url = ''
+        try:
+            # Try getting from hidden input
+            cert_input = driver.find_element(By.NAME, 'xxTrustedFormCertUrl')
+            cert_url = cert_input.get_attribute('value')
+        except:
+            pass
+            
+        print(f"✅ Captured Cert URL: {cert_url}")
+        
+        # 4. Submit Form
+        print("🚀 Submitting form...")
+        submit_btn = driver.find_element(By.ID, 'submitBtn')
+        submit_btn.click()
+        
+        # 5. Wait for success
+        time.sleep(5)
+        
+        return {
+            'success': True,
+            'trustedform_cert_url': cert_url,
+            'proxy_ip': 'Server-Side Proxy' # Placeholder until we verify IP
+        }
+        
+    except Exception as e:
+        print(f"❌ Browser Error: {e}")
+        return {'success': False, 'error': str(e)}
+    finally:
+        if driver:
+            driver.quit()
 
 @app.route('/')
 def index():
@@ -687,7 +796,7 @@ def view_leads():
         conn = get_db_connection()
         
         # Handle row factory differences
-        if DATABASE_URL:
+        if DATABASE_URL and POSTGRES_AVAILABLE:
             # Postgres
             c = conn.cursor(cursor_factory=RealDictCursor)
         else:
@@ -763,6 +872,45 @@ def save_lead_api():
         print(f"❌ Error saving lead from extension: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/landing')
+def landing_page():
+    """Serve the Medicare landing page"""
+    return render_template('medicare-landing2.html')
+
+@app.route('/api/submit-lead', methods=['POST'])
+def submit_lead_api():
+    """API endpoint for landing page form submission"""
+    try:
+        data = request.json
+        print(f"📥 Received lead data from landing page: {data}")
+        
+        # Save to Local Database
+        save_lead_to_db(data)
+        
+        # Submit form through proxy
+        trustedform_url = data.get('trustedform_cert_url', '')
+        submission_result = submit_form_through_proxy(data, trustedform_url)
+        
+        # Save to Google Sheets
+        save_to_google_sheets(
+            form_data=data,
+            trustedform_url=trustedform_url,
+            proxy_ip=submission_result.get('proxy_ip') if submission_result else None,
+            submission_status='Success' if submission_result and submission_result.get('success') else 'Failed',
+            trustedform_token=data.get('trustedform_token', ''),
+            trustedform_ping_url=data.get('trustedform_ping_url', '')
+        )
+        
+        if submission_result and submission_result.get('success'):
+            return jsonify({'success': True, 'proxy_ip': submission_result.get('proxy_ip')})
+        else:
+            error_msg = submission_result.get('error', 'Unknown error') if submission_result else 'Request timed out'
+            return jsonify({'success': False, 'error': error_msg})
+            
+    except Exception as e:
+        print(f"❌ Error in submit_lead_api: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/submit-form', methods=['GET', 'POST'])
 
 def submit_form():
@@ -808,37 +956,28 @@ def submit_form():
         form_data['trustedform_ping_url'] = trustedform_ping_url
         form_data['source'] = 'Web Form' # Explicitly set source
         
-        # Save to Local Database
+        # Save to Local Database (Initial)
         save_lead_to_db(form_data)
         
-        # Submit form through proxy
-        submission_result = submit_form_through_proxy(form_data, trustedform_url)
+        # Submit via Server-Side Browser
+        browser_result = submit_lead_via_browser(form_data)
         
-        # Save to Google Sheets FIRST (before checking submission result)
-        # This ensures data is saved even if submission fails or times out
-        sheets_saved = save_to_google_sheets(
-            form_data=form_data,
-            trustedform_url=trustedform_url or '',  # Use empty string if None
-            proxy_ip=submission_result.get('proxy_ip') if submission_result else None,
-            submission_status='Success' if submission_result and submission_result.get('success') else 'Failed',
-            trustedform_token=form_data.get('trustedform_token', ''),
-            trustedform_ping_url=form_data.get('trustedform_ping_url', '')
-        )
-        
-        if submission_result and submission_result.get('success'):
-            flash(f'Form submitted successfully! Proxy IP: {submission_result.get("proxy_ip", "N/A")}', 'success')
-            if sheets_saved:
-                flash('Data saved to Google Sheets successfully!', 'success')
-            else:
-                flash('Warning: Data could not be saved to Google Sheets. Check configuration.', 'warning')
+        if browser_result.get('success'):
+            # Update data with captured Cert URL
+            form_data['trustedform_cert_url'] = browser_result.get('trustedform_cert_url', '')
+            
+            # Save to Google Sheets
+            save_to_google_sheets(
+                form_data=form_data,
+                trustedform_url=form_data['trustedform_cert_url'],
+                proxy_ip=browser_result.get('proxy_ip'),
+                submission_status='Success (Browser)',
+                trustedform_token=form_data.get('trustedform_token', ''),
+                trustedform_ping_url=form_data.get('trustedform_ping_url', '')
+            )
+            flash(f'Form submitted successfully! Cert URL: {form_data["trustedform_cert_url"]}', 'success')
         else:
-            error_msg = submission_result.get('error', 'Unknown error') if submission_result else 'Request timed out'
-            flash(f'Form submission failed: {error_msg}', 'error')
-            # Still try to save to sheets even if submission failed
-            if sheets_saved:
-                flash('Form data saved to Google Sheets despite submission failure.', 'info')
-            else:
-                flash('Warning: Data could not be saved to Google Sheets. Check configuration.', 'warning')
+            flash(f'Submission failed: {browser_result.get("error")}', 'error')
         
         return redirect(url_for('submit_form'))
         

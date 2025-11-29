@@ -12,7 +12,7 @@ services:
     
     http_port: 8080
     
-    environment_slug: python
+    dockerfile_path: Dockerfile
     
     run_command: gunicorn --worker-tmp-dir /dev/shm --config gunicorn_config.py app:app
     
