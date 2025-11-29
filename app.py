@@ -718,7 +718,7 @@ def submit_lead():
         data = request.json
         
         # Basic Validation
-        required_fields = ['first_name', 'last_name', 'phone', 'email', 'zip_code', 'state']
+        required_fields = ['first_name', 'last_name', 'phone', 'zip_code', 'state']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'Missing required field: {field}'}), 400
@@ -727,11 +727,6 @@ def submit_lead():
         phone = data.get('phone', '')
         if not re.match(r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', phone):
              return jsonify({'error': 'Invalid phone number format'}), 400
-
-        # Email Validation
-        email = data.get('email', '')
-        if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            return jsonify({'error': 'Invalid email format'}), 400
 
         # Add metadata
         data['source'] = 'Landing Page'

@@ -6,6 +6,144 @@
     <title>Leads - Proxy Access Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .filter-input {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .clear-btn {
+            padding: 10px 20px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .clear-btn:hover {
+            background: #4b5563;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            flex: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        table th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 24px;
+        }
+
+        table th:hover {
+            background: #f3f4f6;
+        }
+
+        table th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            opacity: 0.3;
+        }
+
+        table th.sorted-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        table th.sorted-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 968px) {
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+
+            .date-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
@@ -16,30 +154,72 @@
     </div>
 
     <div class="container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Leads</div>
+                <div class="stat-value" id="totalCount">{{ leads|length if leads else 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Displayed</div>
+                <div class="stat-value" id="displayedCount">{{ leads|length if leads else 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">With TrustedForm</div>
+                <div class="stat-value" id="tfCount">0</div>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="searchInput">Search</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Search name, phone, email, state...">
+                </div>
+                <div class="filter-group">
+                    <label for="dateFrom">From Date</label>
+                    <input type="date" id="dateFrom" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="dateTo">To Date</label>
+                    <input type="date" id="dateTo" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="clear-btn" onclick="clearFilters()">Clear</button>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h2>📋 Captured Leads</h2>
             
             {% if leads %}
-            <table>
+            <table id="leadsTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Timestamp</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>State/Zip</th>
+                        <th class="sortable" data-column="id">ID</th>
+                        <th class="sortable" data-column="timestamp">Timestamp</th>
+                        <th class="sortable" data-column="name">Name</th>
+                        <th class="sortable" data-column="phone">Phone</th>
+                        <th class="sortable" data-column="email">Email</th>
+                        <th class="sortable" data-column="location">State/Zip</th>
                         <th>TrustedForm</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for lead in leads %}
-                    <tr>
+                    <tr data-timestamp="{{ lead.timestamp }}" 
+                        data-name="{{ lead.first_name }} {{ lead.last_name }}"
+                        data-phone="{{ lead.phone }}"
+                        data-email="{{ lead.email or '' }}"
+                        data-state="{{ lead.state }}"
+                        data-zip="{{ lead.zip_code }}"
+                        data-has-tf="{{ '1' if lead.trustedform_cert_url else '0' }}">
                         <td>{{ lead.id }}</td>
                         <td>{{ lead.timestamp }}</td>
                         <td>{{ lead.first_name }} {{ lead.last_name }}</td>
                         <td>{{ lead.phone }}</td>
-                        <td>{{ lead.email }}</td>
+                        <td>{{ lead.email or 'N/A' }}</td>
                         <td>{{ lead.state }} {{ lead.zip_code }}</td>
                         <td>
                             {% if lead.trustedform_cert_url %}
@@ -52,13 +232,176 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                <h3>No leads found</h3>
+                <p>Try adjusting your search or date filters.</p>
+            </div>
             {% else %}
             <div class="empty-state">
                 <h3>No leads captured yet</h3>
-                <p>Use the Proxy Browser to submit forms and they will appear here.</p>
+                <p>Leads from the landing page will appear here.</p>
             </div>
             {% endif %}
         </div>
     </div>
+
+    <script>
+        let sortDirection = {};
+        let allRows = [];
+
+        function init() {
+            const tbody = document.querySelector('#leadsTable tbody');
+            if (tbody) {
+                allRows = Array.from(tbody.querySelectorAll('tr'));
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const visibleRows = allRows.filter(row => row.style.display !== 'none');
+            const tfCount = visibleRows.filter(row => row.dataset.hasTf === '1').length;
+            
+            document.getElementById('displayedCount').textContent = visibleRows.length;
+            document.getElementById('tfCount').textContent = tfCount;
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            let visibleCount = 0;
+
+            allRows.forEach(row => {
+                let show = true;
+
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = [
+                        row.dataset.name,
+                        row.dataset.phone,
+                        row.dataset.email,
+                        row.dataset.state,
+                        row.dataset.zip
+                    ].join(' ').toLowerCase();
+
+                    if (!searchableText.includes(searchTerm)) {
+                        show = false;
+                    }
+                }
+
+                // Date filter
+                if (show && (dateFrom || dateTo)) {
+                    const rowDate = new Date(row.dataset.timestamp).toISOString().split('T')[0];
+                    
+                    if (dateFrom && rowDate < dateFrom) {
+                        show = false;
+                    }
+                    if (dateTo && rowDate > dateTo) {
+                        show = false;
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            // Show/hide no results message
+            const table = document.getElementById('leadsTable');
+            const noResults = document.getElementById('noResults');
+            if (table) {
+                table.style.display = visibleCount > 0 ? '' : 'none';
+                noResults.style.display = visibleCount > 0 ? 'none' : 'block';
+            }
+
+            updateStats();
+        }
+
+        function sortTable(column) {
+            const currentDirection = sortDirection[column] || 'asc';
+            const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            sortDirection[column] = newDirection;
+
+            // Update header classes
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+            });
+            const clickedHeader = document.querySelector(`th[data-column="${column}"]`);
+            clickedHeader.classList.add(`sorted-${newDirection}`);
+
+            // Sort rows
+            allRows.sort((a, b) => {
+                let aVal, bVal;
+
+                switch(column) {
+                    case 'id':
+                        aVal = parseInt(a.children[0].textContent);
+                        bVal = parseInt(b.children[0].textContent);
+                        break;
+                    case 'timestamp':
+                        aVal = new Date(a.dataset.timestamp);
+                        bVal = new Date(b.dataset.timestamp);
+                        break;
+                    case 'name':
+                        aVal = a.dataset.name.toLowerCase();
+                        bVal = b.dataset.name.toLowerCase();
+                        break;
+                    case 'phone':
+                        aVal = a.dataset.phone;
+                        bVal = b.dataset.phone;
+                        break;
+                    case 'email':
+                        aVal = a.dataset.email.toLowerCase();
+                        bVal = b.dataset.email.toLowerCase();
+                        break;
+                    case 'location':
+                        aVal = `${a.dataset.state} ${a.dataset.zip}`;
+                        bVal = `${b.dataset.state} ${b.dataset.zip}`;
+                        break;
+                }
+
+                if (aVal < bVal) return newDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return newDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Re-append rows
+            const tbody = document.querySelector('#leadsTable tbody');
+            allRows.forEach(row => tbody.appendChild(row));
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            applyFilters();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+
+            const searchInput = document.getElementById('searchInput');
+            const dateFrom = document.getElementById('dateFrom');
+            const dateTo = document.getElementById('dateTo');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', applyFilters);
+            }
+            if (dateFrom) {
+                dateFrom.addEventListener('change', applyFilters);
+            }
+            if (dateTo) {
+                dateTo.addEventListener('change', applyFilters);
+            }
+
+            // Add click handlers to sortable headers
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.addEventListener('click', () => {
+                    sortTable(th.dataset.column);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
