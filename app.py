@@ -560,9 +560,16 @@ def submit_form_through_proxy(form_data, trustedform_url):
         
         # Google Scripts often return 302 Redirect on success, or 200 with HTML
         if response.status_code in [200, 201, 302]:
+            proxy_ip = 'Unknown'
+            try:
+                if proxies and proxies.get('http'):
+                    proxy_ip = proxies.get('http').split('@')[-1].split(':')[0]
+            except Exception as e:
+                print(f"Warning: Could not parse proxy IP: {e}")
+            
             return {
                 'success': True,
-                'proxy_ip': proxies.get('http', '').split('@')[-1].split(':')[0] if proxies else 'Unknown'
+                'proxy_ip': proxy_ip
             }
         else:
             print(f"WARNING: Got response but status code is {response.status_code}")
@@ -670,8 +677,28 @@ def submit_lead_via_browser(form_data):
 
     driver = None
     try:
+        # Debug: Check Chrome version
+        try:
+            chrome_ver = subprocess.check_output(['google-chrome', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+            print(f"DEBUG: Chrome Version: {chrome_ver}")
+        except Exception as e:
+            print(f"DEBUG: Could not get Chrome version: {e}")
+            # Try google-chrome-stable
+            try:
+                chrome_ver = subprocess.check_output(['google-chrome-stable', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chrome Stable Version: {chrome_ver}")
+            except:
+                pass
+
         # Initialize Driver
-        service = Service(ChromeDriverManager().install())
+        print("🔧 Installing/Finding Chromedriver...")
+        try:
+            service = Service(ChromeDriverManager().install())
+        except Exception as e:
+            print(f"⚠️ ChromeDriverManager failed: {e}")
+            print("Trying to proceed without explicit driver installation (hoping it's in PATH)...")
+            service = Service() # Try default
+
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # 1. Go to Landing Page
