@@ -618,25 +618,89 @@ def find_binary(name, start_paths=['/app', '/workspace', '/usr']):
     print(f"❌ Could not find {name}")
     return None
 
+def install_chrome_at_runtime():
+    """Download and install Chrome and Chromedriver to /tmp at runtime"""
+    print("⬇️ Starting Runtime Chrome Installation...")
+    install_dir = "/tmp/chrome-linux64"
+    chrome_exe = os.path.join(install_dir, "chrome-linux64", "chrome")
+    driver_exe = os.path.join(install_dir, "chromedriver-linux64", "chromedriver")
+    
+    if os.path.exists(chrome_exe) and os.path.exists(driver_exe):
+        print(f"✅ Chrome already installed at {chrome_exe}")
+        return chrome_exe, driver_exe
+
+    os.makedirs(install_dir, exist_ok=True)
+    
+    # URLs for Chrome for Testing (Stable)
+    chrome_url = "https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.141/linux64/chrome-linux64.zip"
+    driver_url = "https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.141/linux64/chromedriver-linux64.zip"
+    
+    try:
+        # Download Chrome
+        print(f"⬇️ Downloading Chrome from {chrome_url}...")
+        r = requests.get(chrome_url)
+        with open(os.path.join(install_dir, "chrome.zip"), "wb") as f:
+            f.write(r.content)
+        
+        print("📦 Extracting Chrome...")
+        with zipfile.ZipFile(os.path.join(install_dir, "chrome.zip"), 'r') as zip_ref:
+            zip_ref.extractall(install_dir)
+            
+        # Download Chromedriver
+        print(f"⬇️ Downloading Chromedriver from {driver_url}...")
+        r = requests.get(driver_url)
+        with open(os.path.join(install_dir, "driver.zip"), "wb") as f:
+            f.write(r.content)
+            
+        print("📦 Extracting Chromedriver...")
+        with zipfile.ZipFile(os.path.join(install_dir, "driver.zip"), 'r') as zip_ref:
+            zip_ref.extractall(install_dir)
+            
+        # Make executable
+        os.chmod(chrome_exe, 0o755)
+        os.chmod(driver_exe, 0o755)
+        
+        print(f"✅ Runtime Installation Complete!")
+        print(f"Chrome: {chrome_exe}")
+        print(f"Driver: {driver_exe}")
+        return chrome_exe, driver_exe
+        
+    except Exception as e:
+        print(f"❌ Runtime Installation Failed: {e}")
+        return None, None
+
 def submit_lead_via_browser(form_data):
     """Submit lead by launching a headless browser on the server"""
-    print("🚀 Launching Headless Chrome for submission... [VERSION v8 - SEARCH STRATEGY]")
+    print("🚀 Launching Headless Chrome for submission... [VERSION v9 - RUNTIME DOWNLOADER]")
     
-    # 1. Find Chrome
-    chrome_bin = os.environ.get('GOOGLE_CHROME_BIN') or os.environ.get('CHROME_BIN')
-    if chrome_bin and os.path.exists(chrome_bin):
+    chrome_bin = None
+    chromedriver_path = None
+
+    # 1. Try Env Vars
+    if os.environ.get('GOOGLE_CHROME_BIN') and os.path.exists(os.environ.get('GOOGLE_CHROME_BIN')):
+        chrome_bin = os.environ.get('GOOGLE_CHROME_BIN')
         print(f"DEBUG: Found Chrome via Env Var: {chrome_bin}")
-    else:
-        print("DEBUG: Chrome Env Var missing or invalid. Searching filesystem...")
+    
+    if os.environ.get('CHROMEDRIVER_PATH') and os.path.exists(os.environ.get('CHROMEDRIVER_PATH')):
+        chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+        print(f"DEBUG: Found Chromedriver via Env Var: {chromedriver_path}")
+
+    # 2. Try Filesystem Search
+    if not chrome_bin:
+        print("DEBUG: Searching filesystem for Chrome...")
         chrome_bin = find_binary('google-chrome') or find_binary('chromium') or find_binary('chromium-browser')
 
-    # 2. Find Chromedriver
-    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
-    if chromedriver_path and os.path.exists(chromedriver_path):
-        print(f"DEBUG: Found Chromedriver via Env Var: {chromedriver_path}")
-    else:
-        print("DEBUG: Chromedriver Env Var missing or invalid. Searching filesystem...")
+    if not chromedriver_path:
+        print("DEBUG: Searching filesystem for Chromedriver...")
         chromedriver_path = find_binary('chromedriver')
+
+    # 3. Runtime Download (Fallback)
+    if not chrome_bin or not chromedriver_path:
+        print("⚠️ Chrome/Driver not found. Attempting runtime download...")
+        dl_chrome, dl_driver = install_chrome_at_runtime()
+        if dl_chrome and dl_driver:
+            chrome_bin = dl_chrome
+            chromedriver_path = dl_driver
 
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
@@ -649,7 +713,7 @@ def submit_lead_via_browser(form_data):
         print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
         chrome_options.binary_location = chrome_bin
     else:
-        print("❌ CRITICAL: Could not find Chrome binary anywhere!")
+        print("❌ CRITICAL: Could not find Chrome binary anywhere (Env, Search, or Download)!")
     
     # Configure Proxy if available
     if PROXY_CONFIG.get('username'):
