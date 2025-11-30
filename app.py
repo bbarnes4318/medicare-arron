@@ -656,9 +656,11 @@ def install_chrome_at_runtime():
         with zipfile.ZipFile(os.path.join(install_dir, "driver.zip"), 'r') as zip_ref:
             zip_ref.extractall(install_dir)
             
-        # Make executable
-        os.chmod(chrome_exe, 0o755)
-        os.chmod(driver_exe, 0o755)
+        # Make everything in the install dir executable to be safe (includes crashpad_handler)
+        print("🔐 Setting permissions...")
+        for root, dirs, files in os.walk(install_dir):
+            for f in files:
+                os.chmod(os.path.join(root, f), 0o755)
         
         print(f"✅ Runtime Installation Complete!")
         print(f"Chrome: {chrome_exe}")
