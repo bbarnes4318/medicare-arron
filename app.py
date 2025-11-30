@@ -879,9 +879,15 @@ def submit_lead_via_browser(form_data):
         
         # 2. Fill Form
         print("📝 Filling form...")
-        wait = WebDriverWait(driver, 10)
+        # Increase timeout to 30 seconds for slow Angular loading
+        wait = WebDriverWait(driver, 30)
         
-        # Map fields
+        # Wait for body to be present first
+        print("DEBUG: Waiting for DOM body...")
+        wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        print("DEBUG: DOM body present. Waiting for form fields...")
+        
+        # Map fields (Use IDs as per page.txt)
         fields = {
             'state': form_data.get('state'),
             'zip_code': form_data.get('zip_code'),
@@ -890,15 +896,16 @@ def submit_lead_via_browser(form_data):
             'phone': form_data.get('phone')
         }
         
-        for name, value in fields.items():
+        for field_id, value in fields.items():
             if value:
-                print(f"DEBUG: Filling field '{name}' with '{value}'...")
+                print(f"DEBUG: Filling field '{field_id}' with '{value}'...")
                 try:
-                    elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
+                    # Use By.ID because inputs do not have name attributes
+                    elem = wait.until(EC.presence_of_element_located((By.ID, field_id)))
                     elem.clear()
                     elem.send_keys(value)
                 except Exception as e:
-                    print(f"❌ Failed to find/fill field '{name}': {e}")
+                    print(f"❌ Failed to find/fill field '{field_id}': {e}")
                     print(f"DEBUG: Page Source (First 500 chars): {driver.page_source[:500]}")
                     raise e
                 
@@ -906,7 +913,8 @@ def submit_lead_via_browser(form_data):
         if form_data.get('disclosure'):
             try:
                 print("DEBUG: Clicking disclosure checkbox...")
-                chk = driver.find_element(By.NAME, 'consent')
+                # Checkbox ID is 'leadid_tcpa_disclosure'
+                chk = wait.until(EC.presence_of_element_located((By.ID, 'leadid_tcpa_disclosure')))
                 if not chk.isSelected():
                     chk.click()
             except Exception as e:
@@ -928,7 +936,8 @@ def submit_lead_via_browser(form_data):
         
         # 4. Submit Form
         print("🚀 Submitting form...")
-        submit_btn = driver.find_element(By.ID, 'submitBtn')
+        # Button ID is 'submit'
+        submit_btn = driver.find_element(By.ID, 'submit')
         submit_btn.click()
         
         # 5. Wait for success
