@@ -597,69 +597,9 @@ def submit_form_through_proxy(form_data, trustedform_url):
         return {
             'success': False,
             'error': error_msg,
-        
-        # 2. Fill Form
-        print("📝 Filling form...")
-        wait = WebDriverWait(driver, 10)
-        
-        # Map fields
-        fields = {
-            'state': form_data.get('state'),
-            'zip_code': form_data.get('zip_code'),
-            'first_name': form_data.get('first_name'),
-            'last_name': form_data.get('last_name'),
-            'phone': form_data.get('phone')
+            'proxy_ip': None
         }
-        
-        for name, value in fields.items():
-            if value:
-                elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
-                elem.clear()
-                elem.send_keys(value)
-                
-        # Checkbox
-        if form_data.get('disclosure'):
-            try:
-                chk = driver.find_element(By.NAME, 'consent')
-                if not chk.isSelected():
-                    chk.click()
-            except:
-                pass
 
-        # 3. Capture TrustedForm Cert URL (Wait for it to generate)
-        print("⏳ Waiting for TrustedForm certificate...")
-        time.sleep(3) # Give TF time to load
-        
-        cert_url = ''
-        try:
-            # Try getting from hidden input
-            cert_input = driver.find_element(By.NAME, 'xxTrustedFormCertUrl')
-            cert_url = cert_input.get_attribute('value')
-        except:
-            pass
-            
-        print(f"✅ Captured Cert URL: {cert_url}")
-        
-        # 4. Submit Form
-        print("🚀 Submitting form...")
-        submit_btn = driver.find_element(By.ID, 'submitBtn')
-        submit_btn.click()
-        
-        # 5. Wait for success
-        time.sleep(5)
-        
-        return {
-            'success': True,
-            'trustedform_cert_url': cert_url,
-            'proxy_ip': 'Server-Side Proxy' # Placeholder until we verify IP
-        }
-        
-    except Exception as e:
-        print(f"❌ Browser Error: {e}")
-        return {'success': False, 'error': str(e)}
-    finally:
-        if driver:
-            driver.quit()
 
 @app.route('/')
 def index():
