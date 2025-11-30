@@ -1,0 +1,10 @@
+chromium-browser
+chromium-chromedriver
+libnss3
+libgconf-2-4
+libxi6
+libxss1
+libasound2
+fonts-liberation
+libappindicator3-1
+xdg-utils

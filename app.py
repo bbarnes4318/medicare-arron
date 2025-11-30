@@ -32,6 +32,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import zipfile
 import os
+import shutil
 
 
 # Load environment variables from .env file if it exists
@@ -711,6 +712,12 @@ def submit_lead_via_browser(form_data):
                 print(f"DEBUG: Chromium Version: {chrome_ver}")
             except:
                 pass
+            # Try chromium-browser (Ubuntu/Buildpack)
+            try:
+                chrome_ver = subprocess.check_output(['chromium-browser', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chromium Browser Version: {chrome_ver}")
+            except:
+                pass
 
         # Initialize Driver
         print("🔧 Installing/Finding Chromedriver...")
@@ -729,6 +736,15 @@ def submit_lead_via_browser(form_data):
             
             print("Trying to proceed without explicit driver installation (hoping it's in PATH)...")
             service = Service() # Try default
+
+        # Set binary location if we found chromium-browser but not chromium
+        if not chrome_options.binary_location:
+            if shutil.which('chromium-browser'):
+                print("DEBUG: Found chromium-browser, setting binary location")
+                chrome_options.binary_location = shutil.which('chromium-browser')
+            elif shutil.which('chromium'):
+                print("DEBUG: Found chromium, setting binary location")
+                chrome_options.binary_location = shutil.which('chromium')
 
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
