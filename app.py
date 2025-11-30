@@ -874,6 +874,8 @@ def submit_lead_via_browser(form_data):
         target_url = "https://lowinsurancecost.com/"
         print(f"🌐 Navigating to {target_url}...")
         driver.get(target_url)
+        print(f"DEBUG: Page Title: {driver.title}")
+        print(f"DEBUG: Current URL: {driver.current_url}")
         
         # 2. Fill Form
         print("📝 Filling form...")
@@ -890,18 +892,25 @@ def submit_lead_via_browser(form_data):
         
         for name, value in fields.items():
             if value:
-                elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
-                elem.clear()
-                elem.send_keys(value)
+                print(f"DEBUG: Filling field '{name}' with '{value}'...")
+                try:
+                    elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
+                    elem.clear()
+                    elem.send_keys(value)
+                except Exception as e:
+                    print(f"❌ Failed to find/fill field '{name}': {e}")
+                    print(f"DEBUG: Page Source (First 500 chars): {driver.page_source[:500]}")
+                    raise e
                 
         # Checkbox
         if form_data.get('disclosure'):
             try:
+                print("DEBUG: Clicking disclosure checkbox...")
                 chk = driver.find_element(By.NAME, 'consent')
                 if not chk.isSelected():
                     chk.click()
-            except:
-                pass
+            except Exception as e:
+                print(f"⚠️ Failed to click checkbox: {e}")
 
         # 3. Capture TrustedForm Cert URL (Wait for it to generate)
         print("⏳ Waiting for TrustedForm certificate...")
