@@ -8,3 +8,11 @@ libasound2
 fonts-liberation
 libappindicator3-1
 xdg-utils
+libgbm1
+libatk-bridge2.0-0
+libgtk-3-0
+libx11-xcb1
+libxcb-dri3-0
+libxtst6
+lsb-release
+libcurl4
