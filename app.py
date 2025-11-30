@@ -737,14 +737,30 @@ def submit_lead_via_browser(form_data):
             print("Trying to proceed without explicit driver installation (hoping it's in PATH)...")
             service = Service() # Try default
 
-        # Set binary location if we found chromium-browser but not chromium
+        # Set binary location from Heroku Buildpack env vars
         if not chrome_options.binary_location:
-            if shutil.which('chromium-browser'):
-                print("DEBUG: Found chromium-browser, setting binary location")
-                chrome_options.binary_location = shutil.which('chromium-browser')
-            elif shutil.which('chromium'):
-                print("DEBUG: Found chromium, setting binary location")
-                chrome_options.binary_location = shutil.which('chromium')
+            if os.environ.get('GOOGLE_CHROME_BIN'):
+                print(f"DEBUG: Using GOOGLE_CHROME_BIN: {os.environ.get('GOOGLE_CHROME_BIN')}")
+                chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+            elif os.environ.get('CHROME_BIN'):
+                 chrome_options.binary_location = os.environ.get('CHROME_BIN')
+
+        # Initialize Driver
+        print("🔧 Installing/Finding Chromedriver...")
+        try:
+            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+            if chromedriver_path and os.path.exists(chromedriver_path):
+                print(f"DEBUG: Using system Chromedriver at {chromedriver_path}")
+                service = Service(executable_path=chromedriver_path)
+            else:
+                 # Fallback for Heroku buildpack if env var is missing but file exists
+                 if os.path.exists("/app/.chromedriver/bin/chromedriver"):
+                     service = Service(executable_path="/app/.chromedriver/bin/chromedriver")
+                 else:
+                     service = Service(ChromeDriverManager().install())
+        except Exception as e:
+            print(f"⚠️ ChromeDriverManager failed: {e}")
+            service = Service()
 
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
