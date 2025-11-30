@@ -601,6 +601,229 @@ def submit_form_through_proxy(form_data, trustedform_url):
         }
 
 
+
+def submit_lead_via_browser(form_data):
+    """Submit lead by launching a headless browser on the server"""
+    print("🚀 Launching Headless Chrome for submission... [VERSION v7 - HARDCODED PATHS]")
+    
+    # Debug: Print all env keys to see what we have
+    print(f"DEBUG: Env Keys: {[k for k in os.environ.keys() if 'CHROME' in k or 'PATH' in k]}")
+
+    # Check for Heroku paths explicitly
+    heroku_chrome_path = "/app/.apt/usr/bin/google-chrome"
+    heroku_driver_path = "/app/.chromedriver/bin/chromedriver"
+
+    print(f"DEBUG: Checking {heroku_chrome_path}: {os.path.exists(heroku_chrome_path)}")
+    print(f"DEBUG: Checking {heroku_driver_path}: {os.path.exists(heroku_driver_path)}")
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    # Explicitly set binary location if env var is present (Docker)
+    chrome_bin = os.environ.get('CHROME_BIN')
+    if chrome_bin:
+        print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
+        chrome_options.binary_location = chrome_bin
+    
+    # Configure Proxy if available
+    if PROXY_CONFIG.get('username'):
+        # Create a dynamic extension for proxy authentication
+        # This is required because Headless Chrome doesn't support auth popups
+        plugin_file = 'proxy_auth_plugin.zip'
+        
+        manifest_json = """
+        {
+            "version": "1.0.0",
+            "manifest_version": 2,
+            "name": "Chrome Proxy",
+            "permissions": [
+                "proxy",
+                "tabs",
+                "unlimitedStorage",
+                "storage",
+                "<all_urls>",
+                "webRequest",
+                "webRequestBlocking"
+            ],
+            "background": {
+                "scripts": ["background.js"]
+            },
+            "minimum_chrome_version":"22.0.0"
+        }
+        """
+
+        background_js = """
+        var config = {
+                mode: "fixed_servers",
+                rules: {
+                  singleProxy: {
+                    scheme: "http",
+                    host: "%s",
+                    port: parseInt(%s)
+                  },
+                  bypassList: ["localhost"]
+                }
+              };
+
+        chrome.proxy.settings.set({value: config, scope: "regular"}, function() {});
+
+        function callbackFn(details) {
+            return {
+                authCredentials: {
+                    username: "%s",
+                    password: "%s"
+                }
+            };
+        }
+
+        chrome.webRequest.onAuthRequired.addListener(
+                    callbackFn,
+                    {urls: ["<all_urls>"]},
+                    ['blocking']
+        );
+        """ % (PROXY_CONFIG['host'], PROXY_CONFIG['port'], PROXY_CONFIG['username'], PROXY_CONFIG['password'])
+
+        with zipfile.ZipFile(plugin_file, 'w') as zp:
+            zp.writestr("manifest.json", manifest_json)
+            zp.writestr("background.js", background_js)
+            
+        chrome_options.add_extension(plugin_file)
+        print(f"✅ Added Proxy Auth Extension: {PROXY_CONFIG['host']}:{PROXY_CONFIG['port']}")
+
+    driver = None
+    try:
+        # Debug: Check Chrome version
+        try:
+            chrome_ver = subprocess.check_output(['google-chrome', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+            print(f"DEBUG: Chrome Version: {chrome_ver}")
+        except Exception as e:
+            print(f"DEBUG: Could not get Chrome version: {e}")
+            # Try google-chrome-stable
+            try:
+                chrome_ver = subprocess.check_output(['google-chrome-stable', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chrome Stable Version: {chrome_ver}")
+            except:
+                pass
+            # Try chromium
+            try:
+                chrome_ver = subprocess.check_output(['chromium', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chromium Version: {chrome_ver}")
+            except:
+                pass
+            # Try chromium-browser (Ubuntu/Buildpack)
+            try:
+                chrome_ver = subprocess.check_output(['chromium-browser', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chromium Browser Version: {chrome_ver}")
+            except:
+                pass
+
+        # Initialize Driver
+        print("🔧 Installing/Finding Chromedriver...")
+        try:
+            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+            
+            # Check Heroku path first
+            if os.path.exists(heroku_driver_path):
+                 print(f"DEBUG: Found Heroku Chromedriver at {heroku_driver_path}")
+                 service = Service(executable_path=heroku_driver_path)
+            elif chromedriver_path and os.path.exists(chromedriver_path):
+                print(f"DEBUG: Using system Chromedriver at {chromedriver_path}")
+                service = Service(executable_path=chromedriver_path)
+            else:
+                 # Fallback for Heroku buildpack if env var is missing but file exists
+                 if os.path.exists("/app/.chromedriver/bin/chromedriver"):
+                     service = Service(executable_path="/app/.chromedriver/bin/chromedriver")
+                 else:
+                     service = Service(ChromeDriverManager().install())
+        except Exception as e:
+            print(f"⚠️ ChromeDriverManager failed: {e}")
+            service = Service()
+
+        # Set binary location from Heroku Buildpack env vars or paths
+        if not chrome_options.binary_location:
+            if os.path.exists(heroku_chrome_path):
+                print(f"DEBUG: Using Heroku Chrome at {heroku_chrome_path}")
+                chrome_options.binary_location = heroku_chrome_path
+            elif os.environ.get('GOOGLE_CHROME_BIN'):
+                print(f"DEBUG: Using GOOGLE_CHROME_BIN: {os.environ.get('GOOGLE_CHROME_BIN')}")
+                chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+            elif os.environ.get('CHROME_BIN'):
+                 chrome_options.binary_location = os.environ.get('CHROME_BIN')
+
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # 1. Go to Landing Page
+        target_url = "https://lowinsurancecost.com/"
+        print(f"🌐 Navigating to {target_url}...")
+        driver.get(target_url)
+        
+        # 2. Fill Form
+        print("📝 Filling form...")
+        wait = WebDriverWait(driver, 10)
+        
+        # Map fields
+        fields = {
+            'state': form_data.get('state'),
+            'zip_code': form_data.get('zip_code'),
+            'first_name': form_data.get('first_name'),
+            'last_name': form_data.get('last_name'),
+            'phone': form_data.get('phone')
+        }
+        
+        for name, value in fields.items():
+            if value:
+                elem = wait.until(EC.presence_of_element_located((By.NAME, name)))
+                elem.clear()
+                elem.send_keys(value)
+                
+        # Checkbox
+        if form_data.get('disclosure'):
+            try:
+                chk = driver.find_element(By.NAME, 'consent')
+                if not chk.isSelected():
+                    chk.click()
+            except:
+                pass
+
+        # 3. Capture TrustedForm Cert URL (Wait for it to generate)
+        print("⏳ Waiting for TrustedForm certificate...")
+        time.sleep(3) # Give TF time to load
+        
+        cert_url = ''
+        try:
+            # Try getting from hidden input
+            cert_input = driver.find_element(By.NAME, 'xxTrustedFormCertUrl')
+            cert_url = cert_input.get_attribute('value')
+        except:
+            pass
+            
+        print(f"✅ Captured Cert URL: {cert_url}")
+        
+        # 4. Submit Form
+        print("🚀 Submitting form...")
+        submit_btn = driver.find_element(By.ID, 'submitBtn')
+        submit_btn.click()
+        
+        # 5. Wait for success
+        time.sleep(5)
+        
+        return {
+            'success': True,
+            'trustedform_cert_url': cert_url,
+            'proxy_ip': 'Server-Side Proxy' # Placeholder until we verify IP
+        }
+        
+    except Exception as e:
+        print(f"❌ Browser Error: {e}")
+        return {'success': False, 'error': str(e)}
+    finally:
+        if driver:
+            driver.quit()
+
 @app.route('/')
 def index():
     """Home page - redirect to login or dashboard"""
