@@ -601,7 +601,17 @@ def submit_form_through_proxy(form_data, trustedform_url):
 
 def submit_lead_via_browser(form_data):
     """Submit lead by launching a headless browser on the server"""
-    print("🚀 Launching Headless Chrome for submission...")
+    print("🚀 Launching Headless Chrome for submission... [VERSION v5]")
+    print(f"DEBUG: CHROMEDRIVER_PATH env var: {os.environ.get('CHROMEDRIVER_PATH')}")
+    if os.environ.get('CHROMEDRIVER_PATH'):
+        print(f"DEBUG: CHROMEDRIVER_PATH exists: {os.path.exists(os.environ.get('CHROMEDRIVER_PATH'))}")
+    
+    # Debug: List /usr/bin/chrom*
+    try:
+        print(f"DEBUG: /usr/bin/chromium exists: {os.path.exists('/usr/bin/chromium')}")
+        print(f"DEBUG: /usr/bin/chromedriver exists: {os.path.exists('/usr/bin/chromedriver')}")
+    except:
+        pass
     
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")

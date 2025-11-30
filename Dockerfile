@@ -21,6 +21,6 @@ COPY . .
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 ENV PORT=8080
-ENV CACHE_BUST=2025-11-30-v4
+ENV CACHE_BUST=2025-11-30-v5
 
 CMD ["gunicorn", "--worker-tmp-dir", "/dev/shm", "--config", "gunicorn_config.py", "app:app"]
