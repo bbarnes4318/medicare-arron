@@ -707,6 +707,9 @@ def submit_lead_via_browser(form_data):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-software-rasterizer")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument(f"--user-data-dir={os.path.join('/tmp', 'chrome-user-data-' + str(uuid.uuid4()))}")
     chrome_options.add_argument("--window-size=1920,1080")
     
     if chrome_bin:
@@ -726,10 +729,20 @@ def submit_lead_via_browser(form_data):
                 if 'not found' in line:
                     print(f"❌ MISSING LIB: {line.strip()}")
             
-            # 3. Try running it directly
-            print("DEBUG: Attempting dry run of Chrome...")
+            # 3. Try running it directly (MATCHING SELENIUM FLAGS)
+            print("DEBUG: Attempting dry run of Chrome (with flags)...")
+            dry_run_cmd = [
+                chrome_bin, 
+                '--headless=new', 
+                '--no-sandbox', 
+                '--disable-dev-shm-usage', 
+                '--disable-gpu', 
+                '--remote-debugging-port=9222',
+                '--dump-dom', 
+                'https://example.com'
+            ]
             proc = subprocess.Popen(
-                [chrome_bin, '--headless', '--disable-gpu', '--dump-dom', 'https://example.com'],
+                dry_run_cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
