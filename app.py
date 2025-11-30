@@ -712,6 +712,37 @@ def submit_lead_via_browser(form_data):
     if chrome_bin:
         print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
         chrome_options.binary_location = chrome_bin
+        
+        # 🔍 DIAGNOSTIC: Check for missing dependencies
+        print("🔍 Running Chrome Diagnostic...")
+        try:
+            # 1. Check permissions
+            print(f"DEBUG: Permissions for {chrome_bin}: {oct(os.stat(chrome_bin).st_mode)[-3:]}")
+            
+            # 2. Run ldd to see missing libraries
+            print("DEBUG: Checking libraries (ldd)...")
+            ldd_out = subprocess.check_output(['ldd', chrome_bin], stderr=subprocess.STDOUT).decode('utf-8')
+            for line in ldd_out.split('\n'):
+                if 'not found' in line:
+                    print(f"❌ MISSING LIB: {line.strip()}")
+            
+            # 3. Try running it directly
+            print("DEBUG: Attempting dry run of Chrome...")
+            proc = subprocess.Popen(
+                [chrome_bin, '--headless', '--disable-gpu', '--dump-dom', 'https://example.com'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = proc.communicate(timeout=10)
+            print(f"DEBUG: Dry Run Exit Code: {proc.returncode}")
+            if proc.returncode != 0:
+                print(f"❌ Dry Run STDERR: {stderr.decode('utf-8')}")
+            else:
+                print("✅ Dry Run Success!")
+                
+        except Exception as e:
+            print(f"⚠️ Diagnostic failed: {e}")
+
     else:
         print("❌ CRITICAL: Could not find Chrome binary anywhere (Env, Search, or Download)!")
     
