@@ -810,35 +810,17 @@ def submit_lead_via_browser(form_data):
         # Initialize Driver
         print("🔧 Installing/Finding Chromedriver...")
         try:
-            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
-            
-            # Check Heroku path first
-            if os.path.exists(heroku_driver_path):
-                 print(f"DEBUG: Found Heroku Chromedriver at {heroku_driver_path}")
-                 service = Service(executable_path=heroku_driver_path)
-            elif chromedriver_path and os.path.exists(chromedriver_path):
-                print(f"DEBUG: Using system Chromedriver at {chromedriver_path}")
-                service = Service(executable_path=chromedriver_path)
+            if chromedriver_path and os.path.exists(chromedriver_path):
+                 print(f"DEBUG: Using Chromedriver at {chromedriver_path}")
+                 service = Service(executable_path=chromedriver_path)
             else:
-                 # Fallback for Heroku buildpack if env var is missing but file exists
-                 if os.path.exists("/app/.chromedriver/bin/chromedriver"):
-                     service = Service(executable_path="/app/.chromedriver/bin/chromedriver")
-                 else:
-                     service = Service(ChromeDriverManager().install())
+                 print("⚠️ Chromedriver path not found in logic, trying ChromeDriverManager...")
+                 service = Service(ChromeDriverManager().install())
         except Exception as e:
             print(f"⚠️ ChromeDriverManager failed: {e}")
             service = Service()
 
-        # Set binary location from Heroku Buildpack env vars or paths
-        if not chrome_options.binary_location:
-            if os.path.exists(heroku_chrome_path):
-                print(f"DEBUG: Using Heroku Chrome at {heroku_chrome_path}")
-                chrome_options.binary_location = heroku_chrome_path
-            elif os.environ.get('GOOGLE_CHROME_BIN'):
-                print(f"DEBUG: Using GOOGLE_CHROME_BIN: {os.environ.get('GOOGLE_CHROME_BIN')}")
-                chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-            elif os.environ.get('CHROME_BIN'):
-                 chrome_options.binary_location = os.environ.get('CHROME_BIN')
+        # Binary location is already set at the top of the function
 
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
