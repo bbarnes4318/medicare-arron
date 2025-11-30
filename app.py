@@ -695,11 +695,22 @@ def submit_lead_via_browser(form_data):
                 print(f"DEBUG: Chrome Stable Version: {chrome_ver}")
             except:
                 pass
+            # Try chromium
+            try:
+                chrome_ver = subprocess.check_output(['chromium', '--version'], stderr=subprocess.STDOUT).decode('utf-8').strip()
+                print(f"DEBUG: Chromium Version: {chrome_ver}")
+            except:
+                pass
 
         # Initialize Driver
         print("🔧 Installing/Finding Chromedriver...")
         try:
-            service = Service(ChromeDriverManager().install())
+            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+            if chromedriver_path and os.path.exists(chromedriver_path):
+                print(f"DEBUG: Using system Chromedriver at {chromedriver_path}")
+                service = Service(executable_path=chromedriver_path)
+            else:
+                service = Service(ChromeDriverManager().install())
         except Exception as e:
             print(f"⚠️ ChromeDriverManager failed: {e}")
             # Check for the specific NoneType error which means Chrome isn't found
