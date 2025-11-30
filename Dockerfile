@@ -6,6 +6,17 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     unzip \
     curl \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libnspr4 \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    libxss1 \
+    libappindicator1 \
+    libindicator7 \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm google-chrome-stable_current_amd64.deb \

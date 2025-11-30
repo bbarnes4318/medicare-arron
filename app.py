@@ -610,6 +610,12 @@ def submit_lead_via_browser(form_data):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     
+    # Explicitly set binary location if env var is present (Docker)
+    chrome_bin = os.environ.get('CHROME_BIN')
+    if chrome_bin:
+        print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
+        chrome_options.binary_location = chrome_bin
+    
     # Configure Proxy if available
     if PROXY_CONFIG.get('username'):
         # Create a dynamic extension for proxy authentication
