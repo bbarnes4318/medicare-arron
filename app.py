@@ -602,19 +602,41 @@ def submit_form_through_proxy(form_data, trustedform_url):
 
 
 
+def find_binary(name, start_paths=['/app', '/workspace', '/usr']):
+    """Recursively search for a binary in the given paths"""
+    print(f"🔍 Searching for {name} in {start_paths}...")
+    for start_path in start_paths:
+        if not os.path.exists(start_path):
+            continue
+        for root, dirs, files in os.walk(start_path):
+            if name in files:
+                full_path = os.path.join(root, name)
+                # Check if executable
+                if os.access(full_path, os.X_OK):
+                    print(f"✅ Found {name} at: {full_path}")
+                    return full_path
+    print(f"❌ Could not find {name}")
+    return None
+
 def submit_lead_via_browser(form_data):
     """Submit lead by launching a headless browser on the server"""
-    print("🚀 Launching Headless Chrome for submission... [VERSION v7 - HARDCODED PATHS]")
+    print("🚀 Launching Headless Chrome for submission... [VERSION v8 - SEARCH STRATEGY]")
     
-    # Debug: Print all env keys to see what we have
-    print(f"DEBUG: Env Keys: {[k for k in os.environ.keys() if 'CHROME' in k or 'PATH' in k]}")
+    # 1. Find Chrome
+    chrome_bin = os.environ.get('GOOGLE_CHROME_BIN') or os.environ.get('CHROME_BIN')
+    if chrome_bin and os.path.exists(chrome_bin):
+        print(f"DEBUG: Found Chrome via Env Var: {chrome_bin}")
+    else:
+        print("DEBUG: Chrome Env Var missing or invalid. Searching filesystem...")
+        chrome_bin = find_binary('google-chrome') or find_binary('chromium') or find_binary('chromium-browser')
 
-    # Check for Heroku paths explicitly
-    heroku_chrome_path = "/app/.apt/usr/bin/google-chrome"
-    heroku_driver_path = "/app/.chromedriver/bin/chromedriver"
-
-    print(f"DEBUG: Checking {heroku_chrome_path}: {os.path.exists(heroku_chrome_path)}")
-    print(f"DEBUG: Checking {heroku_driver_path}: {os.path.exists(heroku_driver_path)}")
+    # 2. Find Chromedriver
+    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+    if chromedriver_path and os.path.exists(chromedriver_path):
+        print(f"DEBUG: Found Chromedriver via Env Var: {chromedriver_path}")
+    else:
+        print("DEBUG: Chromedriver Env Var missing or invalid. Searching filesystem...")
+        chromedriver_path = find_binary('chromedriver')
 
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
@@ -623,11 +645,11 @@ def submit_lead_via_browser(form_data):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     
-    # Explicitly set binary location if env var is present (Docker)
-    chrome_bin = os.environ.get('CHROME_BIN')
     if chrome_bin:
         print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
         chrome_options.binary_location = chrome_bin
+    else:
+        print("❌ CRITICAL: Could not find Chrome binary anywhere!")
     
     # Configure Proxy if available
     if PROXY_CONFIG.get('username'):
