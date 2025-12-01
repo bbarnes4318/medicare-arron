@@ -129,6 +129,71 @@
             padding: 40px;
             color: #6b7280;
         }
+        
+        /* Improved Table Styling */
+        #leadsTable {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+        }
+        
+        #leadsTable th {
+            background-color: #f9fafb;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+        }
+        
+        #leadsTable td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        #leadsTable tbody tr {
+            background: white;
+            transition: background-color 0.2s;
+        }
+        
+        #leadsTable tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .cert-link {
+            color: #0E2F5A;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 4px 12px;
+            background: #eff6ff;
+            border-radius: 4px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        
+        .cert-link:hover {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0E2F5A;
+        }
 
         @media (max-width: 968px) {
             .filters-row {
