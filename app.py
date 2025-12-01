@@ -823,6 +823,13 @@ def submit_lead_via_browser(form_data):
     chrome_options.add_argument(f"--user-data-dir={os.path.join('/tmp', 'chrome-user-data-' + str(uuid.uuid4()))}")
     chrome_options.add_argument("--window-size=1920,1080")
     
+    # STRICT PROXY ENFORCEMENT
+    # We add this even if we use the extension, as a fallback/reinforcement
+    if PROXY_CONFIG.get('host') and PROXY_CONFIG.get('port'):
+        proxy_server = f"{PROXY_CONFIG['host']}:{PROXY_CONFIG['port']}"
+        print(f"DEBUG: Enforcing proxy via command line: {proxy_server}")
+        chrome_options.add_argument(f"--proxy-server=http://{proxy_server}")
+    
     if chrome_bin:
         print(f"DEBUG: Setting Chrome binary location to: {chrome_bin}")
         chrome_options.binary_location = chrome_bin
@@ -1031,17 +1038,39 @@ def submit_lead_via_browser(form_data):
 
         # 3. Capture TrustedForm Cert URL (Wait for it to generate)
         print("⏳ Waiting for TrustedForm certificate...")
-        time.sleep(3) # Give TF time to load
         
         cert_url = ''
         try:
-            # Try getting from hidden input
-            cert_input = driver.find_element(By.NAME, 'xxTrustedFormCertUrl')
-            cert_url = cert_input.get_attribute('value')
-        except:
-            pass
+            # Wait up to 10 seconds for the certificate to be generated
+            # It usually appears in a hidden input named 'xxTrustedFormCertUrl'
+            # OR we can try to execute JS to get it if the global object exists
             
-        print(f"✅ Captured Cert URL: {cert_url}")
+            def get_cert_url(d):
+                try:
+                    # Try hidden input first
+                    el = d.find_element(By.NAME, 'xxTrustedFormCertUrl')
+                    val = el.get_attribute('value')
+                    if val and val.startswith('https://cert.trustedform.com'):
+                        return val
+                except:
+                    pass
+                return False
+                
+            cert_url = wait.until(get_cert_url)
+            print(f"✅ Captured Cert URL: {cert_url}")
+        except Exception as e:
+            print(f"⚠️ Could not capture TrustedForm URL via element: {e}")
+            # Try JS fallback
+            try:
+                cert_url = driver.execute_script("return document.querySelector('[name=\"xxTrustedFormCertUrl\"]').value")
+                print(f"✅ Captured Cert URL via JS: {cert_url}")
+            except:
+                print("❌ Failed to capture TrustedForm URL")
+
+        # Capture IP as seen by the page (if possible)
+        # We can't easily do this on the target page without submitting, 
+        # but we can trust the proxy settings if the submission works.
+        
         
         # 4. Submit Form
         print("🚀 Submitting form...")
@@ -1463,7 +1492,28 @@ def submit_form():
         
         if browser_result.get('success'):
             # Update data with captured Cert URL
-            form_data['trustedform_cert_url'] = browser_result.get('trustedform_cert_url', '')
+            captured_cert_url = browser_result.get('trustedform_cert_url', '')
+            if captured_cert_url:
+                print(f"✅ Updating Cert URL to captured one: {captured_cert_url}")
+                form_data['trustedform_cert_url'] = captured_cert_url
+                
+                # UPDATE DATABASE with new Cert URL
+                try:
+                    conn = get_db_connection()
+                    c = conn.cursor()
+                    is_postgres = (DATABASE_URL is not None) and POSTGRES_AVAILABLE
+                    placeholder = '%s' if is_postgres else '?'
+                    
+                    if is_postgres:
+                        c.execute("UPDATE leads SET trustedform_cert_url = %s WHERE id = %s", (captured_cert_url, lead_id))
+                    else:
+                        c.execute("UPDATE leads SET trustedform_cert_url = ? WHERE id = ?", (captured_cert_url, lead_id))
+                    conn.commit()
+                    conn.close()
+                    print("✅ Database updated with correct TrustedForm URL")
+                except Exception as e:
+                    print(f"❌ Failed to update database with new cert URL: {e}")
+
             
             # Save to Google Sheets
             save_to_google_sheets(
