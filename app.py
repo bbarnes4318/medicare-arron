@@ -56,6 +56,16 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
+@app.template_filter('from_json')
+def from_json_filter(s):
+    """Custom filter to parse JSON string in templates"""
+    if not s:
+        return {}
+    try:
+        return json.loads(s)
+    except:
+        return {}
+
 
 # Proxy configuration for Decodo residential proxies
 # Use environment variables for production deployment
