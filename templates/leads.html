@@ -223,18 +223,20 @@
     </header>
 
     <div class="container">
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-label">Total Leads</div>
-                <div class="stat-value" id="totalCount">{{ leads|length if leads else 0 }}</div>
+        <div class="stat-ribbon">
+            <div class="stat-item">
+                <span class="stat-label">Total Leads:</span>
+                <span class="stat-value" id="totalCount">{{ leads|length if leads else 0 }}</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Displayed</div>
-                <div class="stat-value" id="displayedCount">{{ leads|length if leads else 0 }}</div>
+            <div style="width: 1px; height: 16px; background: #E5E7EB;"></div>
+            <div class="stat-item">
+                <span class="stat-label">Displayed:</span>
+                <span class="stat-value" id="displayedCount">{{ leads|length if leads else 0 }}</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">With TrustedForm</div>
-                <div class="stat-value" id="tfCount">0</div>
+            <div style="width: 1px; height: 16px; background: #E5E7EB;"></div>
+            <div class="stat-item">
+                <span class="stat-label">TrustedForm:</span>
+                <span class="stat-value" id="tfCount">0</span>
             </div>
         </div>
 

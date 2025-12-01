@@ -32,16 +32,14 @@
                 <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo">
             </div>
             <div class="header-nav">
-                <button class="btn btn-ghost" onclick="window.location.href='{{ url_for('logout') }}';">Logout</button>
+                <a href="{{ url_for('logout') }}" class="btn btn-ghost">Logout</a>
             </div>
         </div>
     </header>
 
     <main class="container">
         {% if username %}
-        <div style="margin-top: 2rem;">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-ghost" style="padding-left: 0;">← Back to Dashboard</a>
-        </div>
+        <!-- Back button removed as requested -->
         {% endif %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -54,15 +52,12 @@
             {% endif %}
         {% endwith %}
 
-        <div class="form-card">
+        <div class="form-card" style="margin-top: 1rem;">
             <div class="text-center mb-4">
                 <h2>Submit Form</h2>
-                <p>Securely submit lead data through the proxy network</p>
             </div>
             
-            <div class="alert alert-info">
-                <strong>ℹ️ How it works:</strong> Submitting this form launches a secure browser session to <strong>lowinsurancecost.com</strong> via a residential proxy, ensuring a valid TrustedForm certificate is generated.
-            </div>
+            <!-- Removed How it works alert -->
 
             <form id="submitForm" method="POST" action="{{ url_for('submit_form') }}">
                 <div class="form-row">
