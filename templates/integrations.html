@@ -141,22 +141,45 @@
             {% endif %}
         {% endwith %}
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <div>
-                <h1>Integrations</h1>
-                <p style="margin-bottom: 0;">Automatically send your leads to other systems.</p>
+                <h1 style="margin-bottom: 0.5rem;">Integrations</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 0;">Connect your leads to your CRM, Dialer, or other tools.</p>
             </div>
+            <!-- Primary Action Button -->
             <button class="btn btn-primary" onclick="openAddModal()">
-                <span style="font-size: 1.2em;">+</span> Add Integration
+                <span style="font-size: 1.2em; margin-right: 0.5rem;">+</span> Add Integration
             </button>
+        </div>
+
+        <!-- Detailed Instructions / Help Card -->
+        <div class="professional-card" style="background: #EFF6FF; border-color: #BFDBFE; margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem;">
+                <div style="font-size: 2rem;">ℹ️</div>
+                <div>
+                    <h3 style="color: #1E40AF; font-size: 1.1rem; margin-bottom: 0.5rem;">What is this page for?</h3>
+                    <p style="color: #1E3A8A; font-size: 0.95rem; margin-bottom: 1rem;">
+                        This page allows you to automatically send every new lead you submit to another system in real-time. 
+                        For example, you can send leads directly to your CRM (like Salesforce, HubSpot) or a Dialer (like Ringba, Convoso).
+                    </p>
+                    
+                    <h4 style="color: #1E40AF; font-size: 1rem; margin-bottom: 0.5rem;">How to set it up:</h4>
+                    <ol style="color: #1E3A8A; font-size: 0.95rem; line-height: 1.6; padding-left: 1.2rem; margin-bottom: 0;">
+                        <li>Click the <strong>+ Add Integration</strong> button (top right).</li>
+                        <li><strong>Name it:</strong> Give it a name you recognize (e.g., "My CRM").</li>
+                        <li><strong>Destination URL:</strong> Paste the "Webhook URL" or "API Endpoint" provided by your other software.</li>
+                        <li><strong>Map Fields:</strong> Tell us which field matches theirs. For example, if they call the phone number field <code>caller_id</code>, type <code>caller_id</code> next to our "Phone Number" field.</li>
+                        <li>Click <strong>Save</strong>. We will now send data to that URL every time you submit a form.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
 
         {% if not configs %}
         <div class="empty-state">
             <div class="empty-icon">🔌</div>
             <h2>No Integrations Yet</h2>
-            <p class="empty-text">Connect your leads to your CRM, Dialer, or Marketing tools.</p>
-            <button class="btn btn-primary" onclick="openAddModal()">Create Your First Integration</button>
+            <p class="empty-text">You haven't set up any connections. Click the button above to get started.</p>
         </div>
         {% else %}
         
@@ -191,7 +214,7 @@
                 </div>
                 
                 <div class="integration-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="testIntegrationExisting('{{ config.url }}', '{{ config.field_mapping }}')" style="font-size: 0.8rem;">Test</button>
+                    <button class="btn btn-ghost btn-sm" onclick="testIntegrationExisting('{{ config.url }}', '{{ config.field_mapping }}')" style="font-size: 0.8rem;">Test Connection</button>
                     <button class="btn btn-ghost btn-sm" onclick="deleteIntegration('{{ config.id }}')" style="color: #EF4444; font-size: 0.8rem;">Remove</button>
                 </div>
             </div>
