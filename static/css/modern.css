@@ -110,13 +110,13 @@ a:hover { color: var(--primary-orange-dark); }
 }
 
 .btn-primary {
-  background-color: var(--primary-orange);
+  background-color: var(--primary-navy);
   color: white;
-  border-color: var(--primary-orange);
+  border-color: var(--primary-navy);
 }
 .btn-primary:hover {
-  background-color: var(--primary-orange-dark);
-  border-color: var(--primary-orange-dark);
+  background-color: #052240; /* Darker navy */
+  border-color: #052240;
 }
 
 .btn-secondary {
@@ -242,21 +242,6 @@ a:hover { color: var(--primary-orange-dark); }
 }
 
 .action-title {
-  font-weight: 600;
-  color: var(--primary-navy);
-  font-size: 1rem;
-}
-
-.action-desc {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-/* Stats Ribbon (Leads Page) */
-.stat-ribbon {
-  display: flex;
-  align-items: center;
   gap: var(--spacing-xl);
   background: white;
   border: 1px solid var(--border-color);
