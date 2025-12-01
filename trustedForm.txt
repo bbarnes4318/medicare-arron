@@ -1,0 +1,377 @@
+API Key: bb8cc20c4c2842a49d49012233d60477
+
+Retaining a TrustedForm Certificate Via the API
+ActiveProspect account holders who are subscribed to TrustedForm and have added a payment method who are able to use the TrustedForm Certificate API to retain the certificates provided with certified leads. Doing so
+
+Confirms the legitimacy of the certificate
+Gives your account access to view the certificate
+Stores the certificate for future reference
+
+See our full API documentation for additional detail.
+
+To retain a certificate using the TrustedForm API, send an HTTP POST request to the certificate URL which should be provided with your leads's data. (If not, ask you lead vendors to implement TrustedForm Certify)
+
+Do not make a request unless the URL starts with https://cert.trustedform.com, otherwise you may expose your TrustedForm credentials to someone else
+Use a POST request — any other type of request will not retain the certificate
+Use the Accept: application/json request header
+Use the Content-Type: application/json or Content-Type: application/x-www-form-urlencoded header, and encode the request body accordingly.
+In the Authorization header, use HTTP Basic Authentication and pass the API key provided on the "Settings" tab in the TrustedForm Application as the password and 'API' as the ID.
+Reference
+When you retain a certificate, you can include an optional parameter reference We will store this value in the certificate's history record. A use case for the reference parameter is to add your unique lead identifier to the history record, which will provide a reference point from the certificate to the certified lead that you received.
+
+This will indicate which lead a certificate belongs to just by examining the certificate data. If you retain a certificate from a LeadConduit flow, the LeadConduit Lead ID will be automatically assigned as the reference. This allows you to refer back to the lead with which an individual certificate was collected.
+
+Vendor
+When retaining a certificate, you can pass the optional vendor parameter. We will store this value  in the certificate's history record. Some TrustedForm reporting will be grouped by vendor.
+
+If you use our LeadConduit platform, the vendor parameter will be automatically set as the Source name with each certificate retain request.
+
+Response Codes
+If you successfully retain a certificate, an HTTP 200 OK status code will be returned with the JSON representation of the result of the operation.
+If the certificate has expired or never existed, then an HTTP 404 Not Found status code will be returned.
+If you have not authenticated correctly using your API key, an HTTP 403 Forbidden status code will be returned.
+If you receive a 5XX Server Error status code, please retry the retain request. If it continues to fail, please contact support@activeprospect.com
+If you receive any response code other than those above, please let us know.
+
+Logging and Support
+Customers must maintain their own logs of requests made to the TrustedForm API. ActiveProspect does not maintain logs of API requests, and ActiveProspect Support cannot "look up" API requests to provide diagnostic assistance.
+
+If your requests to the TrustedForm API are failing and you can provide us with the raw Http request and the raw Http response returned, ActiveProspect Support may be able to identify the nature of a malformed request. ActiveProspect Support generally cannot instruct you in how to configure your application to make an API request.
+
+
+Certificate URL
+Each Certificate URL acts as the endpoint to a simple RPC API. The HTTP methods listed in this section are used to interact with an individual certificate. Certificate URLs follow a common format, though the format of a certificate ID depends on how the certificate was issued.
+
+https://cert.trustedform.com/eb9fc4dd9bed9ad451a5648946cf4bf09b5bb947
+Run Certificate Operations
+The TrustedForm Certificate API is able to perform multiple operations based on the parameters sent in the request. Each operation is demonstrated in the request body documentation. The overall outcome of the operations is revealed by the outcome property. Best practice is to base your purchase decision on this property.
+
+Separate documentation about the parameters and results of each operation is available in the Operations reference. and can be used alone or in tandem with another operation. The match_lead operation is required when running the retain operation.
+
+Introduction of TrustedForm Certificate API v4.0
+Security
+ HTTP: Basic
+TrustedForm uses HTTP Basic Authentication with the username API and your API key as the password.
+For example: API:1f1b96c9150d8050e858c043d543bb4eadae0e6f'
+
+HTTP Authorization Scheme: basic
+Request
+path Parameters
+cert_id
+required
+string <= 255 characters
+The certificate ID format varies depending on the type of certificate. Certificate ID length will not exceed 255 characters.
+
+Example: eb9fc4dd9bed9ad451a5648946cf4bf09b5bb947
+header Parameters
+Content-Type
+required
+string
+application/json
+
+Api-Version	
+string
+If your account is configured to use an earlier api-version,
+optionally include this header to override the
+
+default behavior and force usage of v4.0. Defaults to your currently
+configured API version, visible in
+[your settings](https://app.trustedform.com/settings).
+Example: 4.0
+Request Body schema: application/json
+optional
+match_lead	
+MatchLeadEmailParameters (object) or MatchLeadPhoneParameters (object) or MatchLeadPhoneEmailParameters (object) (MatchLeadParameters)
+retain	
+object (RetainParameters)
+Though both `retain` parameters are optional, we strongly recommend
+using them. Doing so will record additional
+
+metadata on your stored certificate which is often of use down the road.
+reference	
+string
+Any text that may help you identify the lead associated with the certificate such as a unique lead identifier or URL pointing to the lead in another system. This value will be displayed in your copy of the certificate for your future reference
+
+vendor	
+string
+When retaining a certificate, you can optionally pass the vendor name. This is intended for tracking the name of the company that provided the lead associated with the certificate. TrustedForm will record this value on the certificate stored in your account. Other accounts cannot see this value. When you use TrustedForm reporting, you can easily filter or group by vendor.
+
+insights	
+object (InsightsParameters)
+Request individual Insights data points (`properties`) to be returned
+and terms for which to scan for in a certificate session replay.
+verify	
+object (VerifyParameters)
+The advertiser_name parameter is optional but is required to populate the one_to_one property.
+
+The advertiser_name parameter only applies to the One to One Consent value (returned as one_to_one). It has no effect on any other values returned by the Verify call.
+
+The min_font_size_px_required, min_contrast_ratio_required, and opt_in_types_allowed parameters are optional.
+
+Responses
+200OK
+400Bad Request
+401Incorrect API key
+402Account is inactive or out of funds
+403Uavailable operation requested
+404TrustedForm certificate has expired or could not be found
+405Attempted to claim a 'sandboxed' certificate
+422Unprocessable Entity
+post
+/{cert_id}
+Try it
+Request samples
+Payload
+curl
+Node.js
+Ruby
+application/json
+CopyExpand allCollapse all
+{
+"match_lead": {
+"email": "janedoe@gmail.com"
+},
+"retain": {
+"reference": "1128238382829",
+"vendor": "Acme Co."
+},
+"insights": {
+"properties": [
+"seconds_on_page",
+"domain",
+"bot_detected",
+"confirmed_owner",
+"ip",
+"approx_ip_geo",
+"browser",
+"age_seconds",
+"created_at",
+"expires_at",
+"form_input_method",
+"form_input_kpm",
+"form_input_wpm",
+"is_framed",
+"is_masked",
+"num_sensitive_content_elements",
+"num_sensitive_form_elements",
+"page_url",
+"parent_page_url",
+"os"
+],
+"scans": {
+"forbidden": [
+"free",
+"ipad"
+],
+"required": [
+"home security system"
+]
+}
+},
+"verify": {
+"advertiser_name": "Acme Inc.",
+"min_contrast_ratio_required": 7,
+"min_font_size_px_required": 16,
+"opt_in_types_allowed": [
+"manual",
+"pre-selected",
+"non-interactive"
+]
+}
+}
+Response samples
+200
+400
+401
+402
+403
+
+3 more
+3 more
+application/json
+CopyExpand allCollapse all
+{
+"outcome": "success",
+"reason": "null",
+"match_lead": {
+"email": "janedoe@gmail.com",
+"phone": "51125551212",
+"result": {
+"email_match": true,
+"phone_match": true,
+"success": true
+}
+},
+"retain": {
+"reference": "1128238382829",
+"result": {
+"expires_at": "2023-07-18T12:03:52Z",
+"masked_cert_url": "string",
+"previously_retained": "false"
+},
+"vendor": "Acme Co."
+},
+"insights": {
+"properties": {
+"age_seconds": 76287,
+"approx_ip_geo": {
+"city": "Dallas",
+"country_code": "US",
+"lat": 32.7451,
+"lon": -96.8038,
+"postal_code": "75203",
+"state": "Texas",
+"time_zone": "America/Chicago"
+},
+"bot_detected": false,
+"browser": {
+"full": "Chrome 128.0.0.0",
+"name": "Chrome",
+"user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+"version": {
+"full": "128.0.0.0",
+"major": "128",
+"minor": "0",
+"patch": "0"
+}
+},
+"confirmed_owner": "ActiveProspect, Inc.",
+"created_at": "2024-09-18T17:07:09Z",
+"domain": "example.com",
+"expires_at": "2024-12-20T17:07:09Z",
+"form_input_kpm": 234.92560689115115,
+"form_input_method": [
+"typing"
+],
+"form_input_wpm": 47.355958958168905,
+"ip": "192.168.0.1",
+"is_framed": false,
+"is_masked": false,
+"num_sensitive_content_elements": 0,
+"num_sensitive_form_elements": 0,
+"os": {
+"full": "Mac OS X 10.15.7",
+"is_mobile": false,
+"name": "Mac OS X",
+"version": {
+"full": "10.15.7",
+"major": "10",
+"minor": "15",
+"patch": "7"
+}
+},
+"page_url": "https://www.example.com/contact.html",
+"parent_page_url": null,
+"seconds_on_page": 1129
+},
+"scans": {
+"forbidden": [
+"free"
+],
+"required": [
+"offer"
+],
+"result": {
+"forbidden": {
+"found": [ ],
+"not_found": [
+"free"
+]
+},
+"required": {
+"found": [ ],
+"not_found": [
+"offer"
+]
+},
+"success": false
+}
+}
+},
+"verify": {
+"advertiser_name": "Acme Inc.",
+"languages": [
+{
+"text": "By clicking on the 'Get Rates' button below, I consent to be contacted"
+}
+],
+"min_contrast_ratio_required": 7,
+"min_font_size_px_required": 16,
+"opt_in_types_allowed": [
+"manual",
+"pre-selected",
+"non-interactive"
+],
+"result": {
+"form_submitted": true,
+"language_approved": true,
+"min_contrast_ratio_satisfied": true,
+"min_font_size_px_satisfied": true,
+"one_to_one": true,
+"opt_in_types_satisfied": true,
+"success": true
+}
+}
+}
+
+
+
+Retain
+The retain operation stores a TrustedForm certificate in your account per your account retention setting (defaults to 5 years). This should be performed for all certificates associated with leads you intend to contact so that you have proof of the events that took place.
+
+Important: When retaining a certificate, you must also execute the match_lead operation. This ensures that the lead with which you received the certificate matches the lead data collected on the cert.
+
+Requires a Self-Service plan or higher.
+
+RetainParameters
+Though both `retain` parameters are optional, we strongly recommend
+using them. Doing so will record additional
+
+metadata on your stored certificate which is often of use down the road.
+reference	
+string
+Any text that may help you identify the lead associated with the certificate such as a unique lead identifier or URL pointing to the lead in another system. This value will be displayed in your copy of the certificate for your future reference
+
+vendor	
+string
+When retaining a certificate, you can optionally pass the vendor name. This is intended for tracking the name of the company that provided the lead associated with the certificate. TrustedForm will record this value on the certificate stored in your account. Other accounts cannot see this value. When you use TrustedForm reporting, you can easily filter or group by vendor.
+
+Copy
+{
+"reference": "1128238382829",
+"vendor": "Acme Co."
+}
+RetainResult
+reference	
+string
+    Any text that may help you identify the lead associated with the
+    certificate such as a unique lead
+
+    identifier or URL pointing to the lead in another system. This value
+    will be displayed in your copy of
+
+    the certificate for your future reference.
+result	
+object
+vendor	
+string
+When retaining a certificate, you can optionally pass the vendor
+name. This is intended for tracking the name
+of the company that provided the lead associated with the
+certificate. TrustedForm will record this value on the
+
+certificate stored in your account. Other accounts cannot see this
+value. When you use TrustedForm reporting,
+
+you can easily filter or group by vendor.
+CopyExpand allCollapse all
+{
+"reference": "1128238382829",
+"result": {
+"expires_at": "2023-07-18T12:03:52Z",
+"masked_cert_url": "string",
+"previously_retained": "false"
+},
+"vendor": "Acme Co."
+}
+Next to Insights

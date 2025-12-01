@@ -384,6 +384,60 @@ def generate_trustedform_certificate():
     # This function is kept for backwards compatibility but should not be used
     return None
 
+def retain_trustedform_certificate(cert_url, lead_data):
+    """
+    Retain a TrustedForm certificate using the API.
+    """
+    if not cert_url or 'trustedform.com' not in cert_url:
+        print(f"⚠️ Invalid TrustedForm URL for retention: {cert_url}")
+        return False
+
+    # API Key from trustedForm.txt
+    api_key = "bb8cc20c4c2842a49d49012233d60477"
+    
+    try:
+        print(f"🔒 Retaining TrustedForm Certificate: {cert_url}")
+        
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+        
+        # Prepare match_lead data
+        match_lead = {}
+        if lead_data.get('email'):
+            match_lead['email'] = lead_data.get('email')
+        if lead_data.get('phone'):
+            match_lead['phone'] = lead_data.get('phone')
+            
+        payload = {
+            "match_lead": match_lead,
+            "retain": {
+                "reference": str(lead_data.get('id', '')),
+                "vendor": "lowinsurancecost.com" 
+            }
+        }
+        
+        # The cert_url IS the endpoint to post to
+        response = requests.post(
+            cert_url,
+            json=payload,
+            headers=headers,
+            auth=('API', api_key),
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            print(f"✅ TrustedForm Certificate Retained Successfully!")
+            return True
+        else:
+            print(f"❌ Failed to retain certificate. Status: {response.status_code}, Response: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error retaining TrustedForm certificate: {e}")
+        return False
+
 def save_to_google_sheets(form_data, trustedform_url, proxy_ip=None, submission_status=None, trustedform_token=None, trustedform_ping_url=None):
     """Save form submission data to Google Sheets"""
     if not GOOGLE_SHEETS_AVAILABLE:
@@ -1426,8 +1480,17 @@ def submit_lead_api():
         # Trigger Webhooks
         trigger_webhooks(data)
         
+        # Retain TrustedForm Certificate
+        retention_success = False
+        if trustedform_url:
+            retention_success = retain_trustedform_certificate(trustedform_url, data)
+        
         if submission_result and submission_result.get('success'):
-            return jsonify({'success': True, 'proxy_ip': submission_result.get('proxy_ip')})
+            return jsonify({
+                'success': True, 
+                'proxy_ip': submission_result.get('proxy_ip'),
+                'trustedform_retained': retention_success
+            })
         else:
             error_msg = submission_result.get('error', 'Unknown error') if submission_result else 'Request timed out'
             return jsonify({'success': False, 'error': error_msg})
@@ -1528,7 +1591,17 @@ def submit_form():
             # Trigger Webhooks
             trigger_webhooks(form_data)
             
-            flash(f'Form submitted successfully! Cert URL: {form_data["trustedform_cert_url"]}', 'success')
+            # Retain TrustedForm Certificate
+            retention_success = False
+            if form_data.get('trustedform_cert_url'):
+                retention_success = retain_trustedform_certificate(form_data['trustedform_cert_url'], form_data)
+            
+            if retention_success:
+                flash(f'Form submitted successfully! Cert URL: {form_data["trustedform_cert_url"]}', 'success')
+            elif form_data.get('trustedform_cert_url'):
+                flash(f'Form submitted but TrustedForm Retention FAILED. Please check logs. Cert URL: {form_data["trustedform_cert_url"]}', 'warning')
+            else:
+                flash(f'Form submitted successfully! (No Cert URL captured)', 'success')
         else:
             flash(f'Submission failed: {browser_result.get("error")}', 'error')
         
