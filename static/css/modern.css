@@ -2,41 +2,42 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
-  /* Hopwhistle Brand Colors */
-  --primary-navy: #0E2F5A; /* Primary Brand Navy */
-  --accent-gold: #F4B024; /* Accent Gold */
-  --accent-gold-hover: #E0A020; /* Darker Gold for hover */
+  /* Hopwhistle Brand Colors - From Logo */
+  --primary-orange: #FF6B35; /* Primary Brand Orange */
+  --primary-orange-dark: #E55A2B; /* Darker Orange for hover */
+  --accent-teal: #00A8A8; /* Accent Teal/Turquoise */
+  --accent-teal-dark: #008F8F; /* Darker Teal for hover */
   
   /* Background Colors */
   --bg-white: #FFFFFF; /* Main background */
-  --bg-page: #F5F7FA; /* Page background */
+  --bg-page: #F8F9FA; /* Page background */
   
   /* UI Component Colors */
-  --border: #E3E8EF; /* Borders and dividers */
-  --border-light: #EDF0F5; /* Lighter borders */
-  --border-focus: #0E2F5A; /* Focus state */
+  --border: #E5E7EB; /* Borders and dividers */
+  --border-light: #F0F1F3; /* Lighter borders */
+  --border-focus: #FF6B35; /* Focus state - orange */
   
   /* Text Colors */
-  --text-primary: #1B1F27; /* Body text */
-  --text-secondary: #6C7A91; /* Muted/secondary text */
-  --text-disabled: #AAB4C5; /* Disabled state */
+  --text-primary: #1F2937; /* Body text */
+  --text-secondary: #6B7280; /* Muted/secondary text */
+  --text-disabled: #9CA3AF; /* Disabled state */
   --text-white: #FFFFFF; /* White text */
   
   /* System State Colors */
-  --success: #2BB673;
+  --success: #10B981;
   --success-bg: #ECFDF5;
   --success-border: #A7F3D0;
   
-  --warning: #F0AD4E;
-  --warning-bg: #FFF8E1;
-  --warning-border: #FFE082;
+  --warning: #F59E0B;
+  --warning-bg: #FEF3C7;
+  --warning-border: #FCD34D;
   
-  --error: #D9534F;
-  --error-bg: #FEF2F2;
+  --error: #EF4444;
+  --error-bg: #FEE2E2;
   --error-border: #FECACA;
   
-  --info: #2266BB;
-  --info-bg: #EFF6FF;
+  --info: #3B82F6;
+  --info-bg: #DBEAFE;
   --info-border: #BFDBFE;
 
   /* Spacing Scale - Professional Rhythm */
@@ -94,7 +95,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--primary-navy);
+  color: var(--text-primary);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -125,14 +126,14 @@ p {
 }
 
 a {
-  color: var(--primary-navy);
+  color: var(--primary-orange);
   text-decoration: none;
   transition: color 0.2s ease;
   font-weight: 500;
 }
 
 a:hover {
-  color: var(--accent-gold);
+  color: var(--primary-orange-dark);
 }
 
 /* Layout */
@@ -147,11 +148,11 @@ a:hover {
 .app-header {
   background-color: var(--bg-white);
   border-bottom: 1px solid var(--border);
-  padding: var(--spacing-lg) 0;
+  padding: var(--spacing-md) 0;
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .header-content {
@@ -168,7 +169,7 @@ a:hover {
 }
 
 .logo {
-  height: 168px;
+  height: 60px;
   width: auto;
   object-fit: contain;
 }
@@ -180,13 +181,13 @@ a:hover {
 }
 
 .header-nav a {
-  color: var(--primary-navy);
+  color: var(--text-primary);
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .header-nav a:hover {
-  color: var(--accent-gold);
+  color: var(--primary-orange);
 }
 
 /* Buttons */
@@ -206,15 +207,15 @@ a:hover {
 }
 
 .btn-primary {
-  background-color: var(--primary-navy);
+  background-color: var(--primary-orange);
   color: var(--text-white);
   box-shadow: var(--shadow-sm);
-  border-color: var(--primary-navy);
+  border-color: var(--primary-orange);
 }
 
 .btn-primary:hover {
-  background-color: #1a3d6b;
-  border-color: var(--accent-gold-hover);
+  background-color: var(--primary-orange-dark);
+  border-color: var(--primary-orange-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -239,7 +240,7 @@ a:hover {
 }
 
 .btn-ghost:hover {
-  color: var(--primary-navy);
+  color: var(--primary-orange);
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -348,13 +349,13 @@ a:hover {
 .action-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--accent-gold);
+  border-color: var(--primary-orange);
 }
 
 .action-icon {
   font-size: 2.5rem;
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, var(--primary-navy), #1e4a7a);
+  background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-dark));
   width: 72px;
   height: 72px;
   display: flex;
@@ -368,7 +369,7 @@ a:hover {
   font-size: 1.125rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--primary-navy);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
