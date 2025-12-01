@@ -1,65 +1,70 @@
+<body>
+    <header class="app-header" style="margin-bottom: 1rem; padding: 0.75rem 0;">
+        <div class="container header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo" style="height: 32px;">
             </div>
             <div class="header-nav">
-                <a href="{{ url_for('logout') }}" class="btn btn-ghost">Logout</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>
             </div>
         </div>
     </header>
 
     <main class="container">
-        {% if username %}
-        <!-- Back button removed as requested -->
-        {% endif %}
-
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div style="margin-top: 1rem;">
+                <div style="margin-bottom: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}" style="padding: 0.5rem 1rem; margin-bottom: 0.5rem;">{{ message }}</div>
                 {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
 
-        <div class="form-card" style="margin-top: 1rem;">
-            <div class="text-center mb-4">
-                <h2>Submit Form</h2>
+        <div class="form-card compact-form">
+            <div class="text-center">
+                <h2>Submit New Lead</h2>
             </div>
             
-            <!-- Removed How it works alert -->
-
             <form id="submitForm" method="POST" action="{{ url_for('submit_form') }}">
-                <div class="form-row">
+                <div class="form-row" style="gap: 10px;">
                     <div class="form-group">
-                        <label class="form-label" for="first_name">First Name *</label>
+                        <label class="form-label" for="first_name">First Name</label>
                         <input class="form-input" type="text" id="first_name" name="first_name" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="last_name">Last Name *</label>
+                        <label class="form-label" for="last_name">Last Name</label>
                         <input class="form-input" type="text" id="last_name" name="last_name" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="phone">Phone Number *</label>
-                    <input class="form-input" type="tel" id="phone" name="phone" placeholder="(555) 555-5555" required>
-                </div>
-
-                <div class="form-row">
+                <div class="form-row" style="gap: 10px;">
                     <div class="form-group">
-                        <label class="form-label" for="state">State *</label>
-                        <input class="form-input" type="text" id="state" name="state" placeholder="e.g. FL" required>
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input class="form-input" type="tel" id="phone" name="phone" placeholder="(555) 555-5555" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="zip_code">Zip Code *</label>
-                        <input class="form-input" type="text" id="zip_code" name="zip_code" placeholder="e.g. 33101" required pattern="[0-9]{5}" maxlength="5">
+                        <label class="form-label" for="email">Email (Optional)</label>
+                        <input class="form-input" type="email" id="email" name="email" placeholder="name@example.com">
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-row" style="gap: 10px;">
+                    <div class="form-group">
+                        <label class="form-label" for="state">State</label>
+                        <input class="form-input" type="text" id="state" name="state" placeholder="FL" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="zip_code">Zip Code</label>
+                        <input class="form-input" type="text" id="zip_code" name="zip_code" placeholder="33101" required pattern="[0-9]{5}" maxlength="5">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 0.5rem;">
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="disclosure" name="disclosure" required>
                         <span class="checkbox-text">
-                            This is a solicitation for insurance. By selecting the check box, you represent that you are 18+ years of age and agree to the Privacy Policy and Terms & Conditions. By selecting the above check box "you agree by your electronic signature that you give express written consent to receive marketing communications from us and our partners regarding insurance products and services including but not limited to Medicare Advantage, Medicare Supplement, and Prescription Drug plans through the use by automatic dialing system and pre-recorded calls and artificial voice messages from Low Insurance Cost at the phone number and e-mail address provided by you, including wireless numbers, if applicable, even if you have previously registered the provided number on the Do Not Call Registry. SMS/MMS and data messaging rates may apply. Your consent is not required to get a quote or purchase.
+                            I agree to the <a href="#" style="color: inherit; text-decoration: underline;">Terms</a> & <a href="#" style="color: inherit; text-decoration: underline;">Privacy Policy</a> and provide express written consent to receive marketing communications from Low Insurance Cost via auto-dialer/text at the number provided. Consent is not required to purchase.
                         </span>
                     </label>
                 </div>
@@ -69,8 +74,8 @@
                 <input type="hidden" name="xxTrustedFormToken" id="xxTrustedFormToken_0">
                 <input type="hidden" name="xxTrustedFormPingUrl" id="xxTrustedFormPingUrl_0">
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">
-                    Submit Form
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" id="submitBtn">
+                    Submit Lead
                 </button>
             </form>
         </div>
@@ -80,9 +85,8 @@
         document.getElementById('submitForm').addEventListener('submit', function(e) {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = '<div class="spinner"></div> Generating Certificate...';
+            btn.innerHTML = '<div class="spinner"></div> Processing...';
         });
     </script>
 </body>
 </html>
-
