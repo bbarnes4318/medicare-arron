@@ -5,6 +5,8 @@
   /* Hopwhistle Brand Colors - From Logo */
   --primary-orange: #FF6B35; /* Primary Brand Orange */
   --primary-orange-dark: #E55A2B; /* Darker Orange for hover */
+  --primary-blue: #07305d; /* Primary Brand Blue from logo */
+  --primary-blue-dark: #052240; /* Darker Blue for hover */
   --accent-teal: #00A8A8; /* Accent Teal/Turquoise */
   --accent-teal-dark: #008F8F; /* Darker Teal for hover */
   
@@ -95,7 +97,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--text-primary);
+  color: var(--primary-blue);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -355,7 +357,7 @@ a:hover {
 .action-icon {
   font-size: 2.5rem;
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-dark));
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
   width: 72px;
   height: 72px;
   display: flex;
@@ -369,7 +371,7 @@ a:hover {
   font-size: 1.125rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--text-primary);
+  color: var(--primary-blue);
   letter-spacing: -0.02em;
 }
 
