@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leads - Proxy Access Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Leads - Hopwhistle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .filters-container {
@@ -146,12 +146,16 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>Medicare Form Portal</h1>
-        <div class="navbar-right">
-            <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo">
+            </div>
+            <div class="header-nav">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">← Dashboard</a>
+            </div>
         </div>
-    </div>
+    </header>
 
     <div class="container">
         <div class="stats-row">

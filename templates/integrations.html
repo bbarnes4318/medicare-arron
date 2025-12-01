@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integrations - Medicare Form Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Integrations - Hopwhistle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .integration-card {
@@ -120,15 +120,17 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <a href="{{ url_for('dashboard') }}" style="text-decoration: none; color: white; font-size: 1.2em;">←</a>
-            <h1>Data Pass Integrations</h1>
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo">
+            </div>
+            <div class="header-nav">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">← Dashboard</a>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Add Integration</button>
+            </div>
         </div>
-        <div class="navbar-right">
-            <button class="logout-btn" onclick="openAddModal()">+ Add New Integration</button>
-        </div>
-    </div>
+    </header>
 
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
