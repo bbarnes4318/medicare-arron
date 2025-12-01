@@ -46,15 +46,15 @@
         }
         .mapping-label {
             font-weight: 500;
-            color: var(--text-primary);
+            color: #444;
             width: 120px;
         }
         .arrow {
             color: var(--text-secondary);
         }
         .btn-delete {
-            background: #FEE2E2; /* Light red background for delete */
-            color: #B91C1C;     /* Dark red text */
+            background: #FEE2E2;
+            color: #B91C1C;
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
@@ -80,7 +80,7 @@
             display: flex;
         }
         .modal-content {
-            background: white;
+            background: var(--bg-white);
             padding: 30px;
             border-radius: 16px;
             width: 90%;
@@ -100,7 +100,7 @@
         .form-control {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 16px;
         }
@@ -123,8 +123,7 @@
     <header class="app-header">
         <div class="container header-content">
             <div class="logo-container">
-            <!-- Updated to use the new scalable SVG logo -->
-            <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo">
+                <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo">
             </div>
             <div class="header-nav">
                 <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">← Dashboard</a>
@@ -147,14 +146,11 @@
                 <h1 style="margin-bottom: 0.5rem;">Integrations</h1>
                 <p style="color: var(--text-secondary); margin-bottom: 0;">Connect your leads to your CRM, Dialer, or other tools.</p>
             </div>
-            <!-- Primary Action Button -->
-            <button class="btn btn-primary" onclick="openAddModal()">
-                <span style="font-size: 1.2em; margin-right: 0.5rem;">+</span> Add Integration
-            </button>
+            <!-- The primary “Add Integration” button now lives in the header; removed duplicate here -->
         </div>
 
         <!-- Detailed Instructions / Help Card -->
-        <div class="professional-card" style="background: #EFF6FF; border-color: #BFDBFE; margin-bottom: 2rem;">
+        <div class="professional-card" style="background: #E7F3FE; border-color: #BEE7FD; margin-bottom: 2rem;">
             <div style="display: flex; gap: 1rem;">
                 <div style="font-size: 2rem;">ℹ️</div>
                 <div>
@@ -206,7 +202,7 @@
                         {% for key, value in mapping.items() %}
                             {% if value %}
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 2px;">
-                                <span style="color: #666;">{{ key|replace('_', ' ')|title }}</span>
+                                <span style="color: var(--text-secondary);">{{ key|replace('_', ' ')|title }}</span>
                                 <span style="font-weight: 600; color: var(--primary-navy);">{{ value }}</span>
                             </div>
                             {% endif %}
@@ -235,18 +231,18 @@
             <div class="form-group">
                 <label>1. Name this integration</label>
                 <input type="text" id="intName" class="form-control" placeholder="e.g. CRM Integration, Zapier, Webhook, Marketing Platform">
-                <small style="color: #666;">Just for your reference.</small>
+                <small style="color: var(--text-secondary);">Just for your reference.</small>
             </div>
             
             <div class="form-group">
                 <label>2. Destination URL</label>
                 <input type="url" id="intUrl" class="form-control" placeholder="https://api.example.com/webhook">
-                <small style="color: #666;">Paste the full URL where the data needs to be posted.</small>
+                <small style="color: var(--text-secondary);">Paste the full URL where the data needs to be posted.</small>
             </div>
 
             <div class="form-group">
                 <label>3. Map Your Fields</label>
-                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em; border: 1px solid #ffeeba; color: #856404;">
+                <div style="background: #FFF9E6; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em; border: 1px solid #FBBF24; color: #92400E;">
                     <strong>Instructions:</strong> Look at the API documentation for your destination system. 
                     If they expect the phone number as "phone" or "caller_id", type that exact field name in the box next to "Phone Number".
                 </div>
@@ -256,8 +252,8 @@
                 </div>
             </div>
 
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <!-- Use our button classes without inline overrides so colours come from modern.css -->
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <!-- Buttons now use the standard styles defined in modern.css -->
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-secondary" onclick="testIntegration()">Test Connection</button>
                 <button class="btn btn-primary" onclick="saveIntegration()">Save Integration</button>
