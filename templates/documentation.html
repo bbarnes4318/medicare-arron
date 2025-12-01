@@ -4,169 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation - Proxy Access Portal</title>
-    <!-- Import the shared modern stylesheet and Inter font so documentation adopts the
-         same typography and variables as the rest of the app -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            /* Use Inter for a unified typography and set a light neutral background */
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #F5F8FA;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            /* Replace the purple gradient with the Hopwhistle brand gradient */
-            background: linear-gradient(135deg, #1E3A5F 0%, #1E96FC 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar h1 {
-            font-size: 24px;
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: background 0.2s;
-        }
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.35);
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-
-        .card h2 {
-            color: #1E3A5F;
-            margin-bottom: 15px;
-            font-size: 24px;
-        }
-
-        .card h3 {
-            color: #1E96FC;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .card p, .card li {
-            color: #4B5563;
-            line-height: 1.8;
-            margin-bottom: 10px;
-        }
-
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 20px;
-            border-radius: 10px;
-            overflow-x: auto;
-            margin: 15px 0;
-            position: relative;
-        }
-
-        .code-block pre {
-            margin: 0;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .copy-code-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .info-box {
-            background: #E7F3FE;
-            border-left: 4px solid #1E96FC;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .warning-box {
-            background: #FFF9E6;
-            border-left: 4px solid #FBBF24;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .success-box {
-            background: #F0FDF4;
-            border-left: 4px solid #05F140;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        code {
-            background: #f4f4f4;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            color: #e83e8c;
-        }
-
-        ul {
-            margin-left: 20px;
-        }
-    </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>📚 Documentation</h1>
-        <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
-    </div>
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo">
+                    <span style="font-weight: 600; color: var(--primary-navy); font-size: 1.25rem;">Documentation</span>
+                </a>
+            </div>
+            <div class="header-nav">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                  &larr; Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
 
     <div class="container">
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>🚀 Getting Started</h2>
             <p>
                 Welcome to the Proxy Access Portal! This documentation will help you integrate our IPRoyal proxy service
                 into your applications and scripts.
             </p>
             
-            <div class="info-box">
+            <div class="alert alert-info">
                 <strong>ℹ️ Proxy Information</strong><br>
                 <strong>Host:</strong> {{ proxy_config.host }}<br>
                 <strong>Port:</strong> {{ proxy_config.port }}<br>
@@ -175,14 +40,14 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>🐍 Python Usage Examples</h2>
             
-            <h3>Basic Example with Requests Library</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Basic Example with Requests Library</h3>
             <p>This is the simplest way to use the proxy with Python's <code>requests</code> library:</p>
             
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>import requests
 
 # Proxy configuration
@@ -201,9 +66,9 @@ print(f"Your IP address: {response.text.strip()}")
 print(f"Status code: {response.status_code}")</pre>
             </div>
 
-            <h3>Complete Script with Error Handling</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Complete Script with Error Handling</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>import requests
 
 # Proxy credentials
@@ -253,9 +118,9 @@ if __name__ == "__main__":
         print(response.json())</pre>
             </div>
 
-            <h3>Using with Sessions (Recommended for Multiple Requests)</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Using with Sessions (Recommended for Multiple Requests)</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>import requests
 
 # Create a session with proxy configuration
@@ -282,12 +147,12 @@ for url in urls:
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>🌐 Other Languages</h2>
             
-            <h3>JavaScript/Node.js (using axios)</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">JavaScript/Node.js (using axios)</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>const axios = require('axios');
 const HttpsProxyAgent = require('https-proxy-agent');
 
@@ -306,17 +171,17 @@ axios.get('https://ipv4.icanhazip.com', {
 });</pre>
             </div>
 
-            <h3>cURL Command Line</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">cURL Command Line</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -x {{ proxy_config.host }}:{{ proxy_config.port }} \
      -U {{ proxy_config.username }}:{{ proxy_config.password }} \
      https://ipv4.icanhazip.com</pre>
             </div>
 
-            <h3>PHP (using cURL)</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">PHP (using cURL)</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>&lt;?php
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://ipv4.icanhazip.com");
@@ -331,12 +196,12 @@ curl_close($ch);
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>💡 Best Practices</h2>
             
-            <div class="success-box">
+            <div class="alert alert-success">
                 <strong>✅ DO:</strong>
-                <ul>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                     <li>Use sessions for multiple requests to improve performance</li>
                     <li>Implement proper error handling for proxy failures</li>
                     <li>Set reasonable timeouts (10-30 seconds recommended)</li>
@@ -345,9 +210,9 @@ curl_close($ch);
                 </ul>
             </div>
 
-            <div class="warning-box">
+            <div class="alert alert-error" style="background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA;">
                 <strong>⚠️ DON'T:</strong>
-                <ul>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                     <li>Share your proxy credentials with unauthorized users</li>
                     <li>Hardcode credentials in your source code</li>
                     <li>Make excessive requests that might violate terms of service</li>
@@ -356,22 +221,22 @@ curl_close($ch);
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>🔧 Environment Variables Setup</h2>
             <p>For production use, store credentials as environment variables:</p>
             
-            <h3>Linux/Mac (.bashrc or .zshrc)</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Linux/Mac (.bashrc or .zshrc)</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>export PROXY_HOST="{{ proxy_config.host }}"
 export PROXY_PORT="{{ proxy_config.port }}"
 export PROXY_USER="{{ proxy_config.username }}"
 export PROXY_PASS="{{ proxy_config.password }}"</pre>
             </div>
 
-            <h3>Python Script Using Environment Variables</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Python Script Using Environment Variables</h3>
             <div class="code-block">
-                <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>import os
 import requests
 
@@ -389,15 +254,15 @@ print(response.text.strip())</pre>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom: 2rem;">
             <h2>🆘 Troubleshooting</h2>
             
-            <h3>Common Issues and Solutions</h3>
+            <h3 style="font-size: 1.1rem; color: var(--primary-orange); margin-top: 1.5rem;">Common Issues and Solutions</h3>
             
-            <div class="info-box">
+            <div class="alert alert-info">
                 <strong>Problem: ProxyError or Connection Timeout</strong><br>
                 <strong>Solution:</strong>
-                <ul>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                     <li>Check your internet connection</li>
                     <li>Verify credentials are correct</li>
                     <li>Increase timeout value (e.g., <code>timeout=30</code>)</li>
@@ -405,20 +270,20 @@ print(response.text.strip())</pre>
                 </ul>
             </div>
 
-            <div class="info-box">
+            <div class="alert alert-info">
                 <strong>Problem: Authentication Failed (407 Error)</strong><br>
                 <strong>Solution:</strong>
-                <ul>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                     <li>Double-check username and password</li>
                     <li>Make sure password includes the country specifier: <code>_country-us</code></li>
                     <li>Verify credentials haven't been changed</li>
                 </ul>
             </div>
 
-            <div class="info-box">
+            <div class="alert alert-info">
                 <strong>Problem: SSL Certificate Errors</strong><br>
                 <strong>Solution:</strong>
-                <ul>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                     <li>Update your SSL certificates: <code>pip install --upgrade certifi</code></li>
                     <li>As a last resort (not recommended for production): <code>verify=False</code></li>
                 </ul>
@@ -430,7 +295,7 @@ print(response.text.strip())</pre>
             <p>
                 If you need additional help or have questions about using the proxy service,
                 please contact your system administrator or refer to the
-                <a href="{{ url_for('credentials') }}" style="color: #667eea;">credentials page</a>
+                <a href="{{ url_for('credentials') }}" style="color: var(--primary-orange);">credentials page</a>
                 for the latest proxy information.
             </p>
         </div>
@@ -444,11 +309,9 @@ print(response.text.strip())</pre>
             navigator.clipboard.writeText(text).then(() => {
                 const originalText = button.textContent;
                 button.textContent = '✓ Copied!';
-                button.style.background = '#28a745';
                 
                 setTimeout(() => {
                     button.textContent = originalText;
-                    button.style.background = '#667eea';
                 }, 2000);
             }).catch(err => {
                 alert('Failed to copy: ' + err);
@@ -457,4 +320,3 @@ print(response.text.strip())</pre>
     </script>
 </body>
 </html>
-
