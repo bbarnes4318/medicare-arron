@@ -223,22 +223,7 @@
     </header>
 
     <div class="container">
-        <div class="stat-ribbon">
-            <div class="stat-item">
-                <span class="stat-label">Total Leads:</span>
-                <span class="stat-value" id="totalCount">{{ leads|length if leads else 0 }}</span>
-            </div>
-            <div style="width: 1px; height: 16px; background: #E5E7EB;"></div>
-            <div class="stat-item">
-                <span class="stat-label">Displayed:</span>
-                <span class="stat-value" id="displayedCount">{{ leads|length if leads else 0 }}</span>
-            </div>
-            <div style="width: 1px; height: 16px; background: #E5E7EB;"></div>
-            <div class="stat-item">
-                <span class="stat-label">TrustedForm:</span>
-                <span class="stat-value" id="tfCount">0</span>
-            </div>
-        </div>
+        <!-- Stats moved to header -->
 
         <div class="filters-container">
             <div class="filters-row">
@@ -262,7 +247,18 @@
         </div>
 
         <div class="card">
-            <h2>📋 Captured Leads</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">
+                    📋 Captured Leads 
+                    <span style="font-size: 0.85rem; font-weight: 500; color: #6B7280; margin-left: 1rem; vertical-align: middle;">
+                        Total: <span id="totalCount" style="color: #07305d; font-weight: 700;">{{ leads|length if leads else 0 }}</span>
+                        <span style="margin: 0 8px; color: #E5E7EB;">|</span>
+                        Displayed: <span id="displayedCount" style="color: #07305d; font-weight: 700;">{{ leads|length if leads else 0 }}</span>
+                        <span style="margin: 0 8px; color: #E5E7EB;">|</span>
+                        TrustedForm: <span id="tfCount" style="color: #07305d; font-weight: 700;">0</span>
+                    </span>
+                </h2>
+            </div>
             
             {% if leads %}
             <table id="leadsTable">
