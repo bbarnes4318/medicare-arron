@@ -148,17 +148,17 @@
                 <div>
                     <h2 style="margin-top: 0; color: #004085;">What is this page for?</h2>
                     <p style="color: #004085; line-height: 1.6;">
-                        This tool allows you to automatically send every new lead to another system (like a CRM, Ringba, or Zapier) instantly after it is submitted.
+                        This tool allows you to automatically send every new lead to any external system (CRM, marketing platform, webhook endpoint, or third-party service) instantly after submission via HTTP POST.
                     </p>
                     
                     <h3 style="margin-top: 15px; font-size: 1.1em; color: #004085;">How to set it up (Step-by-Step):</h3>
                     <ol style="color: #004085; line-height: 1.6; padding-left: 20px;">
-                        <li>Click the <strong>"+ Add New Integration"</strong> button at the top right.</li>
-                        <li><strong>Name it:</strong> Give it a name so you remember what it is (e.g., "Send to Ringba").</li>
-                        <li><strong>Paste the URL:</strong> Enter the web address (URL) provided by the other system where the data should be sent.</li>
-                        <li><strong>Map the Fields:</strong> This is the important part! The other system expects data with specific names (like "caller_id" instead of "Phone"). 
-                            <br>Simply type the name <em>they</em> want next to <em>our</em> field. If you leave a box blank, that field won't be sent.</li>
-                        <li>Click <strong>"Test Connection"</strong> to make sure it works, then click <strong>"Save"</strong>.</li>
+                        <li>Click the <strong>"+ Add Integration"</strong> button at the top right.</li>
+                        <li><strong>Name it:</strong> Give it a descriptive name (e.g., "Send to CRM", "Zapier Webhook", "Marketing Platform").</li>
+                        <li><strong>Paste the URL:</strong> Enter the webhook or API endpoint URL where data should be posted.</li>
+                        <li><strong>Map the Fields:</strong> Configure how your form fields map to the receiving system's expected field names. 
+                            <br>Simply type the field name the destination system expects next to each of our fields. Leave blank to exclude a field.</li>
+                        <li>Click <strong>"Test Connection"</strong> to verify, then <strong>"Save"</strong>.</li>
                     </ol>
                 </div>
             </div>
@@ -213,7 +213,7 @@
             
             <div class="form-group">
                 <label>1. Name this integration</label>
-                <input type="text" id="intName" class="form-control" placeholder="e.g. Ringba, Zapier, CRM">
+                <input type="text" id="intName" class="form-control" placeholder="e.g. CRM Integration, Zapier, Webhook, Marketing Platform">
                 <small style="color: #666;">Just for your reference.</small>
             </div>
             
@@ -226,8 +226,8 @@
             <div class="form-group">
                 <label>3. Map Your Fields</label>
                 <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em; border: 1px solid #ffeeba; color: #856404;">
-                    <strong>Instructions:</strong> Look at the documentation for the system you are sending to. 
-                    If they want the phone number to be called "caller_id", type <code>caller_id</code> in the box next to "Phone Number".
+                    <strong>Instructions:</strong> Look at the API documentation for your destination system. 
+                    If they expect the phone number as "phone" or "caller_id", type that exact field name in the box next to "Phone Number".
                 </div>
                 
                 <div id="mappingFields">
