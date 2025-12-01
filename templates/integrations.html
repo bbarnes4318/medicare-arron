@@ -8,12 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .integration-card {
-            background: white;
+            background: var(--bg-white);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
         }
         .integration-header {
             display: flex;
@@ -22,11 +22,11 @@
             margin-bottom: 15px;
         }
         .integration-url {
-            background: #f8f9fa;
+            background: var(--bg-page);
             padding: 8px 12px;
             border-radius: 6px;
             font-family: monospace;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9em;
         }
         .mapping-grid {
@@ -35,7 +35,7 @@
             gap: 15px;
             margin-top: 15px;
             padding: 15px;
-            background: #f8f9fa;
+            background: var(--bg-page);
             border-radius: 8px;
         }
         .mapping-row {
@@ -46,15 +46,15 @@
         }
         .mapping-label {
             font-weight: 500;
-            color: #444;
+            color: var(--text-primary);
             width: 120px;
         }
         .arrow {
-            color: #888;
+            color: var(--text-secondary);
         }
         .btn-delete {
-            background: #ffebee;
-            color: #d32f2f;
+            background: #FEE2E2; /* Light red background for delete */
+            color: #B91C1C;     /* Dark red text */
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
@@ -62,7 +62,7 @@
             font-weight: 500;
         }
         .btn-delete:hover {
-            background: #ffcdd2;
+            background: #FECACA;
         }
         .modal {
             display: none;
@@ -95,7 +95,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #333;
+            color: var(--primary-navy);
         }
         .form-control {
             width: 100%;
@@ -110,7 +110,7 @@
             gap: 15px;
             margin-bottom: 10px;
             padding: 10px;
-            background: #f8f9fa;
+            background: var(--bg-page);
             border-radius: 8px;
         }
         .mapping-source {
@@ -123,7 +123,8 @@
     <header class="app-header">
         <div class="container header-content">
             <div class="logo-container">
-                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo">
+            <!-- Updated to use the new scalable SVG logo -->
+            <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo">
             </div>
             <div class="header-nav">
                 <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">← Dashboard</a>
@@ -157,14 +158,14 @@
             <div style="display: flex; gap: 1rem;">
                 <div style="font-size: 2rem;">ℹ️</div>
                 <div>
-                    <h3 style="color: #1E40AF; font-size: 1.1rem; margin-bottom: 0.5rem;">What is this page for?</h3>
-                    <p style="color: #1E3A8A; font-size: 0.95rem; margin-bottom: 1rem;">
+                    <h3 style="color: var(--primary-navy); font-size: 1.1rem; margin-bottom: 0.5rem;">What is this page for?</h3>
+                    <p style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 1rem;">
                         This page allows you to automatically send every new lead you submit to another system in real-time. 
                         For example, you can send leads directly to your CRM (like Salesforce, HubSpot) or a Dialer (like Ringba, Convoso).
                     </p>
                     
-                    <h4 style="color: #1E40AF; font-size: 1rem; margin-bottom: 0.5rem;">How to set it up:</h4>
-                    <ol style="color: #1E3A8A; font-size: 0.95rem; line-height: 1.6; padding-left: 1.2rem; margin-bottom: 0;">
+                    <h4 style="color: var(--primary-navy); font-size: 1rem; margin-bottom: 0.5rem;">How to set it up:</h4>
+                    <ol style="color: var(--text-primary); font-size: 0.95rem; line-height: 1.6; padding-left: 1.2rem; margin-bottom: 0;">
                         <li>Click the <strong>+ Add Integration</strong> button (top right).</li>
                         <li><strong>Name it:</strong> Give it a name you recognize (e.g., "My CRM").</li>
                         <li><strong>Destination URL:</strong> Paste the "Webhook URL" or "API Endpoint" provided by your other software.</li>
@@ -255,10 +256,11 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                <button class="btn-secondary" onclick="closeModal()" style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
-                <button class="btn-secondary" onclick="testIntegration()" style="background: #e3f2fd; color: #1565c0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Test Connection</button>
-                <button class="btn-primary" onclick="saveIntegration()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Save Integration</button>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <!-- Use our button classes without inline overrides so colours come from modern.css -->
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="testIntegration()">Test Connection</button>
+                <button class="btn btn-primary" onclick="saveIntegration()">Save Integration</button>
             </div>
         </div>
     </div>

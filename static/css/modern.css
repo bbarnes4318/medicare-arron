@@ -3,17 +3,23 @@
 
 :root {
   /* Brand Colors */
-  --primary-navy: #07305d;      /* Brand Base - Headers, Nav */
-  --primary-orange: #fb8b24;    /* Action - Buttons, Links */
-  --primary-orange-dark: #e07a1e;
-  --accent-teal: #1fc092;       /* Success, Highlights */
-  
-  /* Neutral Colors */
+  /*
+    Update the colour palette to match the new Hopwhistle branding.  The
+    primary navy is a rich deep blue used for headings and key text, the
+    primary accent is a bright sky blue for links and action buttons, and
+    the green accent is reserved for success and highlight states.
+  */
+  --primary-navy: #1E3A5F;      /* Brand Base – Headers, Nav, key text */
+  --primary-orange: #1E96FC;    /* Action – Links, primary buttons */
+  --primary-orange-dark: #0E7BCF; /* Darker shade for hover states */
+  --accent-teal: #05F140;       /* Success, positive highlights */
+
+  /* Neutral Colours */
   --bg-white: #FFFFFF;
-  --bg-page: #F3F4F6;           /* Slightly darker grey for better contrast */
-  --text-primary: #111827;      /* Nearly black */
-  --text-secondary: #4B5563;    /* Dark grey */
-  --text-muted: #9CA3AF;
+  --bg-page: #F5F8FA;           /* Light neutral background */
+  --text-primary: #1F2937;      /* Dark grey for body text */
+  --text-secondary: #4B5563;    /* Medium grey for secondary text */
+  --text-muted: #6B7280;
   --border-color: #E5E7EB;
   
   /* Spacing */
@@ -288,9 +294,27 @@ a:hover { color: var(--primary-orange-dark); }
   font-size: 0.875rem;
   border: 1px solid transparent;
 }
-.alert-success { background: #ECFDF5; color: #065F46; border-color: #A7F3D0; }
-.alert-error { background: #FEF2F2; color: #991B1B; border-color: #FECACA; }
-.alert-info { background: #EFF6FF; color: #1E40AF; border-color: #BFDBFE; }
+/*
+  Customise alert colours to align with the new palette.  Success messages
+  use a very light green background and the brand accent for the border,
+  error messages use a subtle pink with deep red text, and informational
+  messages use a pale blue with our primary accent for emphasis.
+*/
+.alert-success {
+  background: #F0FDF4;
+  color: #056C2F;
+  border-color: #D1FAE5;
+}
+.alert-error {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border-color: #FECACA;
+}
+.alert-info {
+  background: #E7F3FE;
+  color: #084C88;
+  border-color: #BEE7FD;
+}
 
 /* Utilities */
 .text-center { text-align: center; }

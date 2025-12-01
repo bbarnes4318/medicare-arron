@@ -1,8 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Lead - Hopwhistle</title>
+    <!-- Modern UI stylesheet using Hopwhistle brand colours -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}" />
+    <!-- Inter font for a clean, professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
 <body>
     <header class="app-header" style="margin-bottom: 1rem; padding: 0.75rem 0;">
         <div class="container header-content">
             <div class="logo-container">
-                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo" style="height: 32px;">
+                <!-- Use the new SVG logo instead of the outdated PNG -->
+                <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo" style="height: 32px;">
             </div>
             <div class="header-nav">
                 <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>

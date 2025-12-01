@@ -10,7 +10,10 @@
     <header class="app-header">
         <div class="container header-content">
             <div class="logo-container">
-                <img src="{{ url_for('static', filename='hopwhistle.png') }}" alt="Hopwhistle" class="logo">
+                <!-- Replace old PNG logo with the new SVG.  This ensures crisp rendering at any
+                     resolution and leverages the updated brand colours.  The filename
+                     remains case‑sensitive on Linux. -->
+                <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo">
             </div>
             <div class="header-nav">
                 <a href="{{ url_for('logout') }}" class="btn btn-ghost">

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation - Proxy Access Portal</title>
+    <!-- Import the shared modern stylesheet and Inter font so documentation adopts the
+         same typography and variables as the rest of the app -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,13 +16,15 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f7fa;
+            /* Use Inter for a unified typography and set a light neutral background */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F5F8FA;
             min-height: 100vh;
         }
 
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Replace the purple gradient with the Hopwhistle brand gradient */
+            background: linear-gradient(135deg, #1E3A5F 0%, #1E96FC 100%);
             color: white;
             padding: 15px 30px;
             display: flex;
@@ -32,7 +38,7 @@
         }
 
         .back-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             color: white;
             border: none;
             padding: 8px 20px;
@@ -40,6 +46,10 @@
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            transition: background 0.2s;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
         }
 
         .container {
@@ -57,20 +67,20 @@
         }
 
         .card h2 {
-            color: #333;
+            color: #1E3A5F;
             margin-bottom: 15px;
             font-size: 24px;
         }
 
         .card h3 {
-            color: #667eea;
+            color: #1E96FC;
             margin-top: 25px;
             margin-bottom: 15px;
             font-size: 18px;
         }
 
         .card p, .card li {
-            color: #666;
+            color: #4B5563;
             line-height: 1.8;
             margin-bottom: 10px;
         }
@@ -106,24 +116,24 @@
         }
 
         .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196F3;
+            background: #E7F3FE;
+            border-left: 4px solid #1E96FC;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
         }
 
         .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
+            background: #FFF9E6;
+            border-left: 4px solid #FBBF24;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
         }
 
         .success-box {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
+            background: #F0FDF4;
+            border-left: 4px solid #05F140;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
