@@ -23,71 +23,79 @@
       <img src="https://api.trustedform.com/ns.gif" />
     </noscript>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+</head>
 <body>
-    <div class="navbar">
-        <h1>Medicare Form Portal</h1>
-        <div class="navbar-right">
-            <button class="logout-btn" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='one-united.png') }}" alt="One United Group" class="logo">
+            </div>
+            <div class="header-nav">
+                <button class="btn btn-ghost" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
+    <main class="container">
         {% if username %}
-        <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+        <div style="margin-top: 2rem;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-ghost" style="padding-left: 0;">← Back to Dashboard</a>
+        </div>
         {% endif %}
-
-
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
+                <div style="margin-top: 1rem;">
                 {% for category, message in messages %}
                     <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
-        <div class="card">
-            <h2>Submit Form to Landing Page</h2>
-            <div class="info-box">
-                <strong>ℹ️ How it works:</strong> Fill out this form and submit it. The server will launch a secure browser, route it through the proxy to <strong>lowinsurancecost.com</strong>, and submit the data for you. This generates a valid TrustedForm certificate with a masked IP.
+        <div class="form-card">
+            <div class="text-center mb-4">
+                <h2>Submit Form</h2>
+                <p>Securely submit lead data through the proxy network</p>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>ℹ️ How it works:</strong> Submitting this form launches a secure browser session to <strong>lowinsurancecost.com</strong> via a residential proxy, ensuring a valid TrustedForm certificate is generated.
             </div>
 
             <form id="submitForm" method="POST" action="{{ url_for('submit_form') }}">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="state">State *</label>
-                        <input type="text" id="state" name="state" placeholder="Enter state (e.g., CA, NY, TX)" required>
+                        <label class="form-label" for="state">State *</label>
+                        <input class="form-input" type="text" id="state" name="state" placeholder="e.g. FL" required>
                     </div>
                     <div class="form-group">
-                        <label for="zip_code">Zip Code *</label>
-                        <input type="text" id="zip_code" name="zip_code" placeholder="Enter zip code" required pattern="[0-9]{5}" maxlength="5">
+                        <label class="form-label" for="zip_code">Zip Code *</label>
+                        <input class="form-input" type="text" id="zip_code" name="zip_code" placeholder="e.g. 33101" required pattern="[0-9]{5}" maxlength="5">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first_name">First Name *</label>
-                        <input type="text" id="first_name" name="first_name" required>
+                        <label class="form-label" for="first_name">First Name *</label>
+                        <input class="form-input" type="text" id="first_name" name="first_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="last_name">Last Name *</label>
-                        <input type="text" id="last_name" name="last_name" required>
+                        <label class="form-label" for="last_name">Last Name *</label>
+                        <input class="form-input" type="text" id="last_name" name="last_name" required>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" placeholder="(555) 555-5555" required>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number *</label>
+                    <input class="form-input" type="tel" id="phone" name="phone" placeholder="(555) 555-5555" required>
                 </div>
 
-                <div class="form-group" style="margin-top: 20px;">
-                    <label style="display: flex; align-items: flex-start; cursor: pointer;">
-                        <input type="checkbox" id="disclosure" name="disclosure" required style="margin-right: 10px; margin-top: 4px; transform: scale(1.2);">
-                        <span style="font-size: 14px; line-height: 1.5;">
+                <div class="form-group">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="disclosure" name="disclosure" required>
+                        <span class="checkbox-text">
                             This is a solicitation for insurance. By selecting the check box, you represent that you are 18+ years of age and agree to the Privacy Policy and Terms & Conditions. By selecting the above check box "you agree by your electronic signature that you give express written consent to receive marketing communications from us and our partners regarding insurance products and services including but not limited to Medicare Advantage, Medicare Supplement, and Prescription Drug plans through the use by automatic dialing system and pre-recorded calls and artificial voice messages from Low Insurance Cost at the phone number and e-mail address provided by you, including wireless numbers, if applicable, even if you have previously registered the provided number on the Do Not Call Registry. SMS/MMS and data messaging rates may apply. Your consent is not required to get a quote or purchase.
                         </span>
                     </label>
@@ -98,22 +106,18 @@
                 <input type="hidden" name="xxTrustedFormToken" id="xxTrustedFormToken_0">
                 <input type="hidden" name="xxTrustedFormPingUrl" id="xxTrustedFormPingUrl_0">
 
-                <button type="submit" class="submit-btn" id="submitBtn">
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">
                     Submit Form
                 </button>
             </form>
         </div>
-    </div>
+    </main>
 
     <script>
         document.getElementById('submitForm').addEventListener('submit', function(e) {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Generating TrustedForm Certificate... (Please wait)';
-            
-            // Note: TrustedForm script automatically populates the hidden fields with IDs:
-            // xxTrustedFormCertUrl_0, xxTrustedFormToken_0, xxTrustedFormPingUrl_0
-            // We don't need to manually populate them if the IDs match what the script expects.
+            btn.innerHTML = '<div class="spinner"></div> Generating Certificate...';
         });
     </script>
 </body>

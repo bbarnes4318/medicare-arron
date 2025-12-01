@@ -4,51 +4,58 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Proxy Access Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
   </head>
   <body>
-    <div class="navbar">
-      <h1>Medicare Form Portal</h1>
-      <div class="navbar-right">
-        <button
-          class="logout-btn"
-          onclick="window.location.href='{{ url_for('logout') }}';"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-
-    <div class="container">
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% endwith %}
-
-
-
-      <div class="card">
-        <h2>🎯 Quick Actions</h2>
-        <div class="quick-actions">
-                <a href="{{ url_for('submit_form') }}" class="action-card">
-                    <h3>📋</h3>
-                    <h3>Submit Form</h3>
-                    <p>Submit form through proxy</p>
-                </a>
-                <a href="{{ url_for('view_leads') }}" class="action-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                    <h3>👥</h3>
-                    <h3>View Leads</h3>
-                    <p>See captured data</p>
-                </a>
-                <a href="{{ url_for('integrations') }}" class="action-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <h3>🔌</h3>
-                    <h3>Integrations</h3>
-                    <p>Configure Webhooks</p>
-                </a>
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='one-united.png') }}" alt="One United Group" class="logo">
+            </div>
+            <div class="header-nav">
+                <button class="btn btn-ghost" onclick="window.location.href='{{ url_for('logout') }}';">
+                  Logout
+                </button>
             </div>
         </div>
-    </div>
+    </header>
+
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %} 
+      {% if messages %} 
+        <div style="margin-top: 2rem;">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} 
+        </div>
+      {% endif %} 
+      {% endwith %}
+
+      <div style="margin-top: 3rem;">
+        <h2>🎯 Quick Actions</h2>
+        <p>Select an action to get started</p>
+        
+        <div class="dashboard-grid">
+            <a href="{{ url_for('submit_form') }}" class="action-card">
+                <div class="action-icon">📋</div>
+                <div class="action-title">Submit Form</div>
+                <div class="action-desc">Submit lead data through the secure proxy network</div>
+            </a>
+            
+            <a href="{{ url_for('view_leads') }}" class="action-card">
+                <div class="action-icon">👥</div>
+                <div class="action-title">View Leads</div>
+                <div class="action-desc">Access and manage captured lead data</div>
+            </a>
+            
+            <a href="{{ url_for('integrations') }}" class="action-card">
+                <div class="action-icon">🔌</div>
+                <div class="action-title">Integrations</div>
+                <div class="action-desc">Configure webhooks and external connections</div>
+            </a>
+        </div>
+      </div>
+    </main>
 
     <script>
         async function launchBrowser() {
@@ -58,7 +65,7 @@
             if (btn.classList.contains('loading')) return;
             
             btn.style.opacity = '0.7';
-            btn.innerHTML = '<h3>⏳</h3><h3>Launching...</h3><p>Please wait</p>';
+            btn.innerHTML = '<div class="spinner" style="border-color: var(--primary); border-top-color: transparent; display: inline-block;"></div> Launching...';
             
             try {
                 const response = await fetch('/launch-browser', {
@@ -88,7 +95,7 @@
             const resultBox = document.getElementById('resultBox');
             
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Testing...';
+            btn.innerHTML = '<div class="spinner"></div> Testing...';
             resultBox.style.display = 'none';
 
             try {
@@ -105,7 +112,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    resultBox.className = 'result-box success';
+                    resultBox.className = 'alert alert-success';
                     resultBox.innerHTML = `
                         <strong>✅ Success!</strong>
                         <div class="ip-display">${data.ip_address}</div>
@@ -113,7 +120,7 @@
                         <small>Status Code: ${data.status_code}</small>
                     `;
                 } else {
-                    resultBox.className = 'result-box error';
+                    resultBox.className = 'alert alert-error';
                     resultBox.innerHTML = `
                         <strong>❌ Connection Failed</strong>
                         <p>${data.error}</p>
@@ -121,7 +128,7 @@
                     `;
                 }
             } catch (error) {
-                resultBox.className = 'result-box error';
+                resultBox.className = 'alert alert-error';
                 resultBox.innerHTML = `
                     <strong>❌ Error</strong>
                     <p>An unexpected error occurred: ${error.message}</p>
@@ -133,5 +140,5 @@
             }
         }
     </script>
-</body>
+  </body>
 </html>
