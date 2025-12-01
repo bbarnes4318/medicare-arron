@@ -643,8 +643,10 @@ def trigger_webhooks(lead_data):
                         timeout=10
                     )
                     print(f"   ✅ Webhook {webhook['name']} response: {resp.status_code}")
+                    if resp.status_code >= 400:
+                        print(f"   ⚠️ Webhook Error Body: {resp.text[:500]}")
                 except Exception as e:
-                    print(f"   ❌ Webhook {webhook['name']} failed: {e}")
+                    print(f"   ❌ Webhook {webhook['name']} failed to send: {e}")
                     
             except Exception as e:
                 print(f"   ❌ Error processing webhook {webhook['name']}: {e}")
