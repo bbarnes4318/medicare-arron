@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrations - Medicare Form Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .integration-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        .integration-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .integration-url {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .mapping-label {
+            font-weight: 500;
+            color: #444;
+            width: 120px;
+        }
+        .arrow {
+            color: #888;
+        }
+        .btn-delete {
+            background: #ffebee;
+            color: #d32f2f;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-delete:hover {
+            background: #ffcdd2;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .mapping-config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .mapping-source {
+            font-weight: 600;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="{{ url_for('dashboard') }}" style="text-decoration: none; color: white; font-size: 1.2em;">←</a>
+            <h1>Data Pass Integrations</h1>
+        </div>
+        <div class="navbar-right">
+            <button class="logout-btn" onclick="openAddModal()">+ Add New Integration</button>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Instructions Section -->
+        <div class="card" style="margin-bottom: 30px; background: #f0f7ff; border: 1px solid #cce5ff;">
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <div style="font-size: 40px;">💡</div>
+                <div>
+                    <h2 style="margin-top: 0; color: #004085;">What is this page for?</h2>
+                    <p style="color: #004085; line-height: 1.6;">
+                        This tool allows you to automatically send every new lead to another system (like a CRM, Ringba, or Zapier) instantly after it is submitted.
+                    </p>
+                    
+                    <h3 style="margin-top: 15px; font-size: 1.1em; color: #004085;">How to set it up (Step-by-Step):</h3>
+                    <ol style="color: #004085; line-height: 1.6; padding-left: 20px;">
+                        <li>Click the <strong>"+ Add New Integration"</strong> button at the top right.</li>
+                        <li><strong>Name it:</strong> Give it a name so you remember what it is (e.g., "Send to Ringba").</li>
+                        <li><strong>Paste the URL:</strong> Enter the web address (URL) provided by the other system where the data should be sent.</li>
+                        <li><strong>Map the Fields:</strong> This is the important part! The other system expects data with specific names (like "caller_id" instead of "Phone"). 
+                            <br>Simply type the name <em>they</em> want next to <em>our</em> field. If you leave a box blank, that field won't be sent.</li>
+                        <li>Click <strong>"Test Connection"</strong> to make sure it works, then click <strong>"Save"</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        {% if not configs %}
+        <div class="card" style="text-align: center; padding: 40px; border-style: dashed; border-color: #ccc;">
+            <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">🔌</div>
+            <h2 style="color: #666;">No Integrations Configured</h2>
+            <p style="color: #888; margin-bottom: 20px;">You haven't set up any data passes yet. Follow the instructions above to get started!</p>
+            <button class="btn-primary" onclick="openAddModal()">Create Your First Integration</button>
+        </div>
+        {% endif %}
+
+        {% for config in configs %}
+        <div class="integration-card">
+            <div class="integration-header">
+                <div>
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2em;">✅</span> {{ config.name }}
+                    </h3>
+                    <div style="margin-top: 5px;">
+                        <span class="integration-url">POST {{ config.url }}</span>
+                    </div>
+                </div>
+                <button class="btn-delete" onclick="deleteIntegration({{ config.id }})">Delete</button>
+            </div>
+            
+            <div class="mapping-grid">
+                {% set mapping = config.field_mapping | from_json %}
+                {% for key, value in mapping.items() %}
+                    {% if value %}
+                    <div class="mapping-row">
+                        <span class="mapping-label">{{ key|replace('_', ' ')|title }}</span>
+                        <span class="arrow">will be sent as →</span>
+                        <span style="font-family: monospace; background: #e3f2fd; padding: 4px 8px; border-radius: 4px; color: #1565c0; font-weight: bold;">{{ value }}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add Integration Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Add New Integration</h2>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>1. Name this integration</label>
+                <input type="text" id="intName" class="form-control" placeholder="e.g. Ringba, Zapier, CRM">
+                <small style="color: #666;">Just for your reference.</small>
+            </div>
+            
+            <div class="form-group">
+                <label>2. Destination URL</label>
+                <input type="url" id="intUrl" class="form-control" placeholder="https://api.example.com/webhook">
+                <small style="color: #666;">Paste the full URL where the data needs to be posted.</small>
+            </div>
+
+            <div class="form-group">
+                <label>3. Map Your Fields</label>
+                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em; border: 1px solid #ffeeba; color: #856404;">
+                    <strong>Instructions:</strong> Look at the documentation for the system you are sending to. 
+                    If they want the phone number to be called "caller_id", type <code>caller_id</code> in the box next to "Phone Number".
+                </div>
+                
+                <div id="mappingFields">
+                    <!-- Fields generated by JS -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                <button class="btn-secondary" onclick="closeModal()" style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
+                <button class="btn-secondary" onclick="testIntegration()" style="background: #e3f2fd; color: #1565c0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Test Connection</button>
+                <button class="btn-primary" onclick="saveIntegration()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Save Integration</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const availableFields = [
+            { id: 'phone', label: 'Phone Number', placeholder: 'e.g. caller_id' },
+            { id: 'first_name', label: 'First Name', placeholder: 'e.g. first_name' },
+            { id: 'last_name', label: 'Last Name', placeholder: 'e.g. last_name' },
+            { id: 'email', label: 'Email Address', placeholder: 'e.g. email_address' },
+            { id: 'state', label: 'State', placeholder: 'e.g. region' },
+            { id: 'zip_code', label: 'Zip Code', placeholder: 'e.g. postal_code' },
+            { id: 'trustedform_cert_url', label: 'TrustedForm URL', placeholder: 'e.g. trusted_form_cert_url' },
+            { id: 'id', label: 'Lead ID', placeholder: 'e.g. lead_id' },
+            { id: 'timestamp', label: 'Timestamp', placeholder: 'e.g. submission_time' }
+        ];
+
+        function initMappingFields() {
+            const container = document.getElementById('mappingFields');
+            container.innerHTML = '';
+            
+            availableFields.forEach(field => {
+                const row = document.createElement('div');
+                row.className = 'mapping-config-row';
+                row.innerHTML = `
+                    <div class="mapping-source">${field.label}</div>
+                    <div style="color: #888; padding: 0 10px;">→</div>
+                    <input type="text" class="form-control mapping-input" 
+                           data-source="${field.id}" 
+                           placeholder="${field.placeholder}"
+                           style="flex: 1;">
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function openAddModal() {
+            initMappingFields();
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+
+        function getFormData() {
+            const name = document.getElementById('intName').value;
+            const url = document.getElementById('intUrl').value;
+            const mapping = {};
+            
+            document.querySelectorAll('.mapping-input').forEach(input => {
+                if (input.value.trim()) {
+                    mapping[input.dataset.source] = input.value.trim();
+                }
+            });
+
+            return { name, url, mapping };
+        }
+
+        async function saveIntegration() {
+            const data = getFormData();
+            if (!data.name || !data.url) {
+                alert('Please enter a name and URL');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/integrations', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function deleteIntegration(id) {
+            if (!confirm('Are you sure you want to delete this integration?')) return;
+            
+            try {
+                const res = await fetch('/api/integrations/' + id, {
+                    method: 'DELETE'
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function testIntegration() {
+            const data = getFormData();
+            if (!data.url) {
+                alert('Please enter a URL to test');
+                return;
+            }
+
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Testing...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/integrations/test', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    alert(`✅ Success! Status: ${result.status_code}\nResponse: ${result.response}`);
+                } else {
+                    alert('❌ Failed: ' + result.error);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Close modal on outside click
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

@@ -138,7 +138,16 @@ def init_db():
                     trustedform_token TEXT,
                     trustedform_ping_url TEXT,
                     source TEXT
-                )
+                );
+                CREATE TABLE IF NOT EXISTS webhook_configs (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT,
+                    url TEXT,
+                    method TEXT DEFAULT 'POST',
+                    headers TEXT,
+                    field_mapping TEXT,
+                    enabled BOOLEAN DEFAULT TRUE
+                );
             ''')
             conn.commit()
             conn.close()
@@ -163,7 +172,16 @@ def init_db():
                     trustedform_token TEXT,
                     trustedform_ping_url TEXT,
                     source TEXT
-                )
+                );
+                CREATE TABLE IF NOT EXISTS webhook_configs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    url TEXT,
+                    method TEXT DEFAULT 'POST',
+                    headers TEXT,
+                    field_mapping TEXT,
+                    enabled INTEGER DEFAULT 1
+                );
             ''')
             conn.commit()
             conn.close()
@@ -278,29 +296,50 @@ def save_lead_to_db(data):
             ) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
         '''
         
-        c.execute(query, (
-            timestamp,
-            data.get('first_name', ''),
-            data.get('last_name', ''),
-            data.get('phone', ''),
-            data.get('email', ''), # Kept for schema compatibility
-            data.get('address', ''),
-            data.get('city', ''),
-            data.get('state', ''),
-            data.get('zip_code', ''),
-            data.get('trustedform_cert_url', ''),
-            data.get('trustedform_token', ''),
-            data.get('trustedform_ping_url', ''),
-            data.get('source', 'Extension Capture'), # Use provided source or default
-            data.get('disclosure', 'No')
-        ))
+        if is_postgres:
+            query += " RETURNING id"
+            c.execute(query, (
+                timestamp,
+                data.get('first_name', ''),
+                data.get('last_name', ''),
+                data.get('phone', ''),
+                data.get('email', ''), # Kept for schema compatibility
+                data.get('address', ''),
+                data.get('city', ''),
+                data.get('state', ''),
+                data.get('zip_code', ''),
+                data.get('trustedform_cert_url', ''),
+                data.get('trustedform_token', ''),
+                data.get('trustedform_ping_url', ''),
+                data.get('source', 'Extension Capture'), # Use provided source or default
+                data.get('disclosure', 'No')
+            ))
+            lead_id = c.fetchone()[0]
+        else:
+            c.execute(query, (
+                timestamp,
+                data.get('first_name', ''),
+                data.get('last_name', ''),
+                data.get('phone', ''),
+                data.get('email', ''), # Kept for schema compatibility
+                data.get('address', ''),
+                data.get('city', ''),
+                data.get('state', ''),
+                data.get('zip_code', ''),
+                data.get('trustedform_cert_url', ''),
+                data.get('trustedform_token', ''),
+                data.get('trustedform_ping_url', ''),
+                data.get('source', 'Extension Capture'), # Use provided source or default
+                data.get('disclosure', 'No')
+            ))
+            lead_id = c.lastrowid
         
         conn.commit()
         conn.close()
-        return True
+        return lead_id, timestamp
     except Exception as e:
         print(f"❌ Error saving to database: {e}")
-        return False
+        return None, None
 
 def login_required(f):
     """Decorator to require login for certain routes"""
@@ -471,8 +510,10 @@ def save_to_google_sheets(form_data, trustedform_url, proxy_ip=None, submission_
         print(f"JSON preview (first 100 chars): {GOOGLE_SHEETS_CREDENTIALS_JSON[:100]}")
         return False
     except Exception as e:
+        import traceback
         error_msg = str(e)
         print(f"Error saving to Google Sheets: {error_msg}")
+        print(f"Traceback: {traceback.format_exc()}")
         
         # Provide helpful error messages
         if "No key could be detected" in error_msg or "private_key" in error_msg.lower():
@@ -488,6 +529,64 @@ def save_to_google_sheets(form_data, trustedform_url, proxy_ip=None, submission_
             print("Please share the spreadsheet with the service account email.")
         
         return False
+
+def trigger_webhooks(lead_data):
+    """Trigger configured webhooks for a new lead"""
+    try:
+        conn = get_db_connection()
+        
+        if DATABASE_URL and POSTGRES_AVAILABLE:
+            c = conn.cursor(cursor_factory=RealDictCursor)
+        else:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            
+        c.execute('SELECT * FROM webhook_configs WHERE enabled = 1 OR enabled = TRUE')
+        webhooks = c.fetchall()
+        conn.close()
+        
+        print(f"🚀 Triggering {len(webhooks)} webhooks...")
+        
+        for webhook in webhooks:
+            try:
+                # Parse mapping
+                mapping = json.loads(webhook['field_mapping']) if webhook['field_mapping'] else {}
+                
+                # Prepare payload
+                payload = {}
+                
+                # Handle Name Splitting logic if requested in mapping
+                # We assume the mapping might have special keys or we handle it here
+                # But the user said "Make it possible to breakup the 'Name' into first name and last name"
+                # The lead_data already has first_name and last_name usually
+                
+                for app_field, target_field in mapping.items():
+                    if not target_field: continue
+                    
+                    value = lead_data.get(app_field, '')
+                    
+                    # Special handling if needed
+                    payload[target_field] = value
+                
+                print(f"   ➡️ Sending to {webhook['name']} ({webhook['url']})...")
+                
+                # Send Request
+                try:
+                    resp = requests.post(
+                        webhook['url'],
+                        json=payload, # Or data=payload depending on requirement, usually JSON is safer default
+                        headers={'Content-Type': 'application/json'},
+                        timeout=10
+                    )
+                    print(f"   ✅ Webhook {webhook['name']} response: {resp.status_code}")
+                except Exception as e:
+                    print(f"   ❌ Webhook {webhook['name']} failed: {e}")
+                    
+            except Exception as e:
+                print(f"   ❌ Error processing webhook {webhook['name']}: {e}")
+                
+    except Exception as e:
+        print(f"❌ Error triggering webhooks: {e}")
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -915,7 +1014,7 @@ def submit_lead_via_browser(form_data):
                 print("DEBUG: Clicking disclosure checkbox...")
                 # Checkbox ID is 'leadid_tcpa_disclosure'
                 chk = wait.until(EC.presence_of_element_located((By.ID, 'leadid_tcpa_disclosure')))
-                if not chk.isSelected():
+                if not chk.is_selected():
                     chk.click()
             except Exception as e:
                 print(f"⚠️ Failed to click checkbox: {e}")
@@ -998,6 +1097,110 @@ def logout():
     session.clear()
     flash(f'Goodbye, {username}! You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/integrations')
+@login_required
+def integrations():
+    """Manage Data Pass Integrations"""
+    try:
+        conn = get_db_connection()
+        if DATABASE_URL and POSTGRES_AVAILABLE:
+            c = conn.cursor(cursor_factory=RealDictCursor)
+        else:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            
+        c.execute('SELECT * FROM webhook_configs')
+        configs = c.fetchall()
+        conn.close()
+        
+        return render_template('integrations.html', configs=configs, username=session.get('username'))
+    except Exception as e:
+        flash(f'Error loading integrations: {e}', 'error')
+        return redirect(url_for('dashboard'))
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def save_integration():
+    """Save a new integration"""
+    try:
+        data = request.json
+        name = data.get('name')
+        url = data.get('url')
+        mapping = json.dumps(data.get('mapping', {}))
+        
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        is_postgres = (DATABASE_URL is not None) and POSTGRES_AVAILABLE
+        placeholder = '%s' if is_postgres else '?'
+        
+        c.execute(f'INSERT INTO webhook_configs (name, url, field_mapping) VALUES ({placeholder}, {placeholder}, {placeholder})',
+                 (name, url, mapping))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/integrations/<int:id>', methods=['DELETE'])
+@login_required
+def delete_integration(id):
+    """Delete an integration"""
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        is_postgres = (DATABASE_URL is not None) and POSTGRES_AVAILABLE
+        placeholder = '%s' if is_postgres else '?'
+        
+        c.execute(f'DELETE FROM webhook_configs WHERE id = {placeholder}', (id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/integrations/test', methods=['POST'])
+@login_required
+def test_integration():
+    """Test an integration with dummy data"""
+    try:
+        data = request.json
+        url = data.get('url')
+        mapping = data.get('mapping', {})
+        
+        # Dummy Data
+        dummy_lead = {
+            'id': 123,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'phone': '555-123-4567',
+            'email': 'john.doe@example.com',
+            'state': 'TX',
+            'zip_code': '75001',
+            'trustedform_cert_url': 'https://cert.trustedform.com/example123'
+        }
+        
+        payload = {}
+        for app_field, target_field in mapping.items():
+            if not target_field: continue
+            payload[target_field] = dummy_lead.get(app_field, '')
+            
+        resp = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+        
+        return jsonify({
+            'success': True, 
+            'status_code': resp.status_code,
+            'response': resp.text[:200]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/dashboard')
 @login_required
@@ -1126,7 +1329,11 @@ def save_lead_api():
         print(f"📥 Received lead data from extension: {data}")
         
         # Save to Local Database
-        db_saved = save_lead_to_db(data)
+        lead_id, timestamp = save_lead_to_db(data)
+        
+        if lead_id:
+            data['id'] = lead_id
+            data['timestamp'] = timestamp
         
         # Also try saving to Google Sheets (optional backup)
         save_to_google_sheets(
@@ -1136,7 +1343,7 @@ def save_lead_api():
             submission_status='Captured via Extension'
         )
         
-        if db_saved:
+        if lead_id:
             return jsonify({'success': True, 'message': 'Lead saved to local database'})
         else:
             return jsonify({'success': False, 'error': 'Failed to save to database'})
@@ -1158,7 +1365,10 @@ def submit_lead_api():
         print(f"📥 Received lead data from landing page: {data}")
         
         # Save to Local Database
-        save_lead_to_db(data)
+        lead_id, timestamp = save_lead_to_db(data)
+        if lead_id:
+            data['id'] = lead_id
+            data['timestamp'] = timestamp
         
         # Submit form through proxy
         trustedform_url = data.get('trustedform_cert_url', '')
@@ -1173,6 +1383,9 @@ def submit_lead_api():
             trustedform_token=data.get('trustedform_token', ''),
             trustedform_ping_url=data.get('trustedform_ping_url', '')
         )
+        
+        # Trigger Webhooks
+        trigger_webhooks(data)
         
         if submission_result and submission_result.get('success'):
             return jsonify({'success': True, 'proxy_ip': submission_result.get('proxy_ip')})
@@ -1230,7 +1443,10 @@ def submit_form():
         form_data['source'] = 'Web Form' # Explicitly set source
         
         # Save to Local Database (Initial)
-        save_lead_to_db(form_data)
+        lead_id, timestamp = save_lead_to_db(form_data)
+        if lead_id:
+            form_data['id'] = lead_id
+            form_data['timestamp'] = timestamp
         
         # Submit via Server-Side Browser
         browser_result = submit_lead_via_browser(form_data)
@@ -1248,6 +1464,10 @@ def submit_form():
                 trustedform_token=form_data.get('trustedform_token', ''),
                 trustedform_ping_url=form_data.get('trustedform_ping_url', '')
             )
+            
+            # Trigger Webhooks
+            trigger_webhooks(form_data)
+            
             flash(f'Form submitted successfully! Cert URL: {form_data["trustedform_cert_url"]}', 'success')
         else:
             flash(f'Submission failed: {browser_result.get("error")}', 'error')
