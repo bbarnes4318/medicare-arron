@@ -5,119 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Integrations - Hopwhistle</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/integrations.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .integration-card {
-            background: var(--bg-white);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-        }
-        .integration-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .integration-url {
-            background: var(--bg-page);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
-        .mapping-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
-            padding: 15px;
-            background: var(--bg-page);
-            border-radius: 8px;
-        }
-        .mapping-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .mapping-label {
-            font-weight: 500;
-            color: #444;
-            width: 120px;
-        }
-        .arrow {
-            color: var(--text-secondary);
-        }
-        .btn-delete {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-delete:hover {
-            background: #FECACA;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: var(--bg-white);
-            padding: 30px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-navy);
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        .mapping-config-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: var(--bg-page);
-            border-radius: 8px;
-        }
-        .mapping-source {
-            font-weight: 600;
-            width: 150px;
-        }
-    </style>
 </head>
 <body>
     <header class="app-header">
@@ -127,12 +16,11 @@
             </div>
             <div class="header-nav">
                 <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">← Dashboard</a>
-                <button class="btn btn-primary" onclick="openAddModal()">+ Add Integration</button>
             </div>
         </div>
     </header>
 
-    <div class="container">
+    <div class="container integrations-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -141,137 +29,286 @@
             {% endif %}
         {% endwith %}
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <div>
-                <h1 style="margin-bottom: 0.5rem;">Integrations</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 0;">Connect your leads to your CRM, Dialer, or other tools.</p>
-            </div>
-            <!-- The primary “Add Integration” button now lives in the header; removed duplicate here -->
+        <!-- Hero Section -->
+        <div class="integrations-hero">
+            <div class="hero-icon">🔌</div>
+            <h1>Connect Your Platforms</h1>
+            <p class="hero-subtitle">Automatically send your leads to any platform in real-time. Set up in just 3 simple steps.</p>
         </div>
 
-        <!-- Detailed Instructions / Help Card -->
-        <div class="professional-card" style="background: #E7F3FE; border-color: #BEE7FD; margin-bottom: 2rem;">
-            <div style="display: flex; gap: 1rem;">
-                <div style="font-size: 2rem;">ℹ️</div>
-                <div>
-                    <h3 style="color: var(--primary-navy); font-size: 1.1rem; margin-bottom: 0.5rem;">What is this page for?</h3>
-                    <p style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 1rem;">
-                        This page allows you to automatically send every new lead you submit to another system in real-time. 
-                        For example, you can send leads directly to your CRM (like Salesforce, HubSpot) or a Dialer (like Ringba, Convoso).
-                    </p>
-                    
-                    <h4 style="color: var(--primary-navy); font-size: 1rem; margin-bottom: 0.5rem;">How to set it up:</h4>
-                    <ol style="color: var(--text-primary); font-size: 0.95rem; line-height: 1.6; padding-left: 1.2rem; margin-bottom: 0;">
-                        <li>Click the <strong>+ Add Integration</strong> button (top right).</li>
-                        <li><strong>Name it:</strong> Give it a name you recognize (e.g., "My CRM").</li>
-                        <li><strong>Destination URL:</strong> Paste the "Webhook URL" or "API Endpoint" provided by your other software.</li>
-                        <li><strong>Map Fields:</strong> Tell us which field matches theirs. For example, if they call the phone number field <code>caller_id</code>, type <code>caller_id</code> next to our "Phone Number" field.</li>
-                        <li>Click <strong>Save</strong>. We will now send data to that URL every time you submit a form.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        {% if not configs %}
-        <div class="empty-state">
-            <div class="empty-icon">🔌</div>
-            <h2>No Integrations Yet</h2>
-            <p class="empty-text">You haven't set up any connections. Click the button above to get started.</p>
-        </div>
-        {% else %}
-        
-        <div class="integration-grid">
-            {% for config in configs %}
-            <div class="integration-card">
-                <div class="integration-header">
-                    <div class="integration-title">{{ config.name }}</div>
-                    <span class="integration-status">Active</span>
+        <!-- How It Works Section -->
+        <div class="how-it-works">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📋</div>
+                    <h3>Get Your Webhook URL</h3>
+                    <p>Find the webhook or API endpoint from your platform (like Ringba, your CRM, or dialer)</p>
                 </div>
                 
-                <div class="integration-details">
-                    <div class="integration-url-box">
-                        POST {{ config.url }}
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">⚙️</div>
+                    <h3>Add Integration</h3>
+                    <p>Create a new integration and paste in your webhook URL</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🎯</div>
+                    <h3>Map Your Fields</h3>
+                    <p>Tell us which fields match between your forms and their system</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Section - Using Ringba -->
+        <div class="example-section">
+            <div class="example-header">
+                <span class="example-badge">📖 Example Guide</span>
+                <h2>Setting Up Ringba Integration</h2>
+                <p>Follow this step-by-step example to connect Ringba (or use it as a template for any other platform)</p>
+            </div>
+
+            <div class="example-steps">
+                <!-- Step 1 -->
+                <div class="example-step">
+                    <div class="example-step-header">
+                        <div class="example-step-number">Step 1</div>
+                        <h3>Get Your Ringba Webhook URL</h3>
                     </div>
-                    
-                    <button class="details-toggle" onclick="toggleDetails('{{ config.id }}')">
-                        View Field Mapping ↓
-                    </button>
-                    
-                    <div id="mapping-{{ config.id }}" class="mapping-preview">
-                        {% set mapping = config.field_mapping | from_json %}
-                        {% for key, value in mapping.items() %}
-                            {% if value %}
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 2px;">
-                                <span style="color: var(--text-secondary);">{{ key|replace('_', ' ')|title }}</span>
-                                <span style="font-weight: 600; color: var(--primary-navy);">{{ value }}</span>
+                    <div class="example-content">
+                        <div class="example-text">
+                            <p><strong>In Ringba:</strong></p>
+                            <ol>
+                                <li>Log into your Ringba account</li>
+                                <li>Go to <strong>Settings → Webhooks</strong></li>
+                                <li>Click <strong>"Create New Webhook"</strong></li>
+                                <li>Copy the webhook URL (it will look like: <code>https://api.ringba.com/v2/webhook/...</code>)</li>
+                            </ol>
+                            <div class="tip-box">
+                                💡 <strong>Tip:</strong> The webhook URL is unique to your account. Keep it safe!
                             </div>
-                            {% endif %}
-                        {% endfor %}
+                        </div>
+                        <div class="example-visual">
+                            <div class="mock-screenshot">
+                                <div class="mock-header">Ringba Dashboard</div>
+                                <div class="mock-content">
+                                    <div class="mock-item">⚙️ Settings</div>
+                                    <div class="mock-item highlight">🔗 Webhooks</div>
+                                    <div class="mock-item">📊 Reports</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="example-step">
+                    <div class="example-step-header">
+                        <div class="example-step-number">Step 2</div>
+                        <h3>Add Integration in Hopwhistle</h3>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-text">
+                            <ol>
+                                <li>Click the <strong>"+ Create Integration"</strong> button below</li>
+                                <li><strong>Name:</strong> Enter "Ringba" (or any name you prefer)</li>
+                                <li><strong>Webhook URL:</strong> Paste the URL you copied from Ringba</li>
+                            </ol>
+                            <div class="tip-box">
+                                💡 <strong>Note:</strong> This works for any platform - just use their webhook URL!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="example-step">
+                    <div class="example-step-header">
+                        <div class="example-step-number">Step 3</div>
+                        <h3>Map Your Fields</h3>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-text">
+                            <p>Match our form fields with Ringba's expected field names:</p>
+                            <div class="field-mapping-example">
+                                <div class="mapping-row-example">
+                                    <span class="our-field">First Name</span>
+                                    <span class="arrow">→</span>
+                                    <span class="their-field">first_name</span>
+                                </div>
+                                <div class="mapping-row-example">
+                                    <span class="our-field">Phone Number</span>
+                                    <span class="arrow">→</span>
+                                    <span class="their-field">caller_id</span>
+                                </div>
+                                <div class="mapping-row-example">
+                                    <span class="our-field">Email</span>
+                                    <span class="arrow">→</span>
+                                    <span class="their-field">email_address</span>
+                                </div>
+                            </div>
+                            <div class="tip-box success">
+                                ✅ <strong>Pro Tip:</strong> Check their API documentation for exact field names!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Integrations Section -->
+        <div class="your-integrations-section">
+            <div class="section-header-with-action">
+                <div>
+                    <h2 class="section-title">Your Active Integrations</h2>
+                    <p class="section-subtitle">Manage all your connected platforms here</p>
+                </div>
+                <button class="btn btn-primary btn-large" onclick="openAddModal()">
+                    <span class="btn-icon">+</span> Create Integration
+                </button>
+            </div>
+
+            {% if not configs %}
+            <div class="empty-state-modern">
+                <div class="empty-illustration">
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                        <circle cx="60" cy="60" r="50" fill="#F0F4F8"/>
+                        <path d="M40 60h40M60 40v40" stroke="#CBD5E0" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>No Integrations Yet</h3>
+                <p>Ready to connect your first platform? Click the button above to get started!</p>
+            </div>
+            {% else %}
+            <div class="integrations-list">
+                {% for config in configs %}
+                <div class="integration-item-modern">
+                    <div class="integration-left">
+                        <div class="integration-icon">🔗</div>
+                        <div class="integration-info-modern">
+                            <h3>{{ config.name }}</h3>
+                            <div class="integration-url">{{ config.url }}</div>
+                        </div>
+                    </div>
+                    <div class="integration-right">
+                        <span class="status-badge active">Active</span>
+                        <button class="btn-icon-only" onclick="toggleIntegrationDetails('{{ config.id }}')" title="View Details">
+                            <span id="toggle-icon-{{ config.id }}">👁️</span>
+                        </button>
+                        <button class="btn-icon-only test" onclick="testIntegrationExisting('{{ config.url }}', '{{ config.field_mapping }}')" title="Test Connection">⚡</button>
+                        <button class="btn-icon-only danger" onclick="deleteIntegration('{{ config.id }}')" title="Delete">🗑️</button>
                     </div>
                 </div>
                 
-                <div class="integration-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="testIntegrationExisting('{{ config.url }}', '{{ config.field_mapping }}')" style="font-size: 0.8rem;">Test Connection</button>
-                    <button class="btn btn-ghost btn-sm" onclick="deleteIntegration('{{ config.id }}')" style="color: #EF4444; font-size: 0.8rem;">Remove</button>
+                <!-- Expandable Details -->
+                <div id="details-{{ config.id }}" class="integration-details-panel">
+                    <div class="details-content">
+                        <h4>Field Mappings</h4>
+                        <div class="mappings-grid">
+                            {% set mapping = config.field_mapping | from_json %}
+                            {% for key, value in mapping.items() %}
+                                {% if value %}
+                                <div class="mapping-item">
+                                    <span class="mapping-source">{{ key|replace('_', ' ')|title }}</span>
+                                    <span class="mapping-arrow">→</span>
+                                    <span class="mapping-dest">{{ value }}</span>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
     <!-- Add Integration Modal -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Add New Integration</h2>
-                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+    <div id="addModal" class="modal-overlay">
+        <div class="modal-new">
+            <div class="modal-header">
+                <h2>Create New Integration</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             
-            <div class="form-group">
-                <label>1. Name this integration</label>
-                <input type="text" id="intName" class="form-control" placeholder="e.g. CRM Integration, Zapier, Webhook, Marketing Platform">
-                <small style="color: var(--text-secondary);">Just for your reference.</small>
-            </div>
-            
-            <div class="form-group">
-                <label>2. Destination URL</label>
-                <input type="url" id="intUrl" class="form-control" placeholder="https://api.example.com/webhook">
-                <small style="color: var(--text-secondary);">Paste the full URL where the data needs to be posted.</small>
-            </div>
-
-            <div class="form-group">
-                <label>3. Map Your Fields</label>
-                <div style="background: #FFF9E6; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em; border: 1px solid #FBBF24; color: #92400E;">
-                    <strong>Instructions:</strong> Look at the API documentation for your destination system. 
-                    If they expect the phone number as "phone" or "caller_id", type that exact field name in the box next to "Phone Number".
+            <div class="modal-body">
+                <div class="progress-indicator">
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-circle">1</div>
+                        <span>Basic Info</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-circle">2</div>
+                        <span>Field Mapping</span>
+                    </div>
                 </div>
-                
-                <div id="mappingFields">
-                    <!-- Fields generated by JS -->
-                </div>
-            </div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <!-- Buttons now use the standard styles defined in modern.css -->
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-secondary" onclick="testIntegration()">Test Connection</button>
-                <button class="btn btn-primary" onclick="saveIntegration()">Save Integration</button>
+                <!-- Step 1: Basic Info -->
+                <div class="modal-step" id="modal-step-1">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">📝</span>
+                            Integration Name
+                        </label>
+                        <input type="text" id="intName" class="form-control" placeholder="e.g., Ringba, My CRM, Zapier">
+                        <small class="field-hint">Give this integration a name you'll recognize</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">🔗</span>
+                            Webhook URL
+                        </label>
+                        <input type="url" id="intUrl" class="form-control" placeholder="https://api.example.com/webhook">
+                        <small class="field-hint">Paste the webhook URL from your platform</small>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="goToStep2()">Next: Map Fields →</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Field Mapping -->
+                <div class="modal-step hidden" id="modal-step-2">
+                    <div class="info-banner">
+                        <span class="banner-icon">💡</span>
+                        <div>
+                            <strong>How Field Mapping Works:</strong>
+                            <p>Enter the exact field name that your platform expects. For example, if they call it "caller_id", type that next to Phone Number.</p>
+                        </div>
+                    </div>
+
+                    <div id="mappingFields" class="mapping-fields-container">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="goToStep1()">← Back</button>
+                        <button class="btn btn-ghost" onclick="testIntegration()">Test Connection</button>
+                        <button class="btn btn-primary" onclick="saveIntegration()">Save Integration</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const availableFields = [
-            { id: 'first_name', label: 'First Name', placeholder: 'e.g. first_name' },
-            { id: 'last_name', label: 'Last Name', placeholder: 'e.g. last_name' },
-            { id: 'phone', label: 'Phone Number', placeholder: 'e.g. caller_id' },
-            { id: 'email', label: 'Email Address', placeholder: 'e.g. email_address' },
-            { id: 'state', label: 'State', placeholder: 'e.g. region' },
-            { id: 'zip_code', label: 'Zip Code', placeholder: 'e.g. postal_code' },
-            { id: 'trustedform_cert_url', label: 'TrustedForm URL', placeholder: 'e.g. trusted_form_cert_url' },
-            { id: 'id', label: 'Lead ID', placeholder: 'e.g. lead_id' },
-            { id: 'timestamp', label: 'Timestamp', placeholder: 'e.g. submission_time' }
+            { id: 'first_name', label: 'First Name', example: 'first_name, fname' },
+            { id: 'last_name', label: 'Last Name', example: 'last_name, lname' },
+            { id: 'phone', label: 'Phone Number', example: 'caller_id, phone' },
+            { id: 'email', label: 'Email Address', example: 'email, email_address' },
+            { id: 'state', label: 'State', example: 'state, region' },
+            { id: 'zip_code', label: 'Zip Code', example: 'zip, postal_code' },
+            { id: 'trustedform_cert_url', label: 'TrustedForm URL', example: 'trusted_form_cert_url' },
+            { id: 'id', label: 'Lead ID', example: 'lead_id, id' },
+            { id: 'timestamp', label: 'Timestamp', example: 'timestamp, created_at' }
         ];
 
         function initMappingFields() {
@@ -280,14 +317,16 @@
             
             availableFields.forEach(field => {
                 const row = document.createElement('div');
-                row.className = 'mapping-config-row';
+                row.className = 'mapping-field-row';
                 row.innerHTML = `
-                    <div class="mapping-source">${field.label}</div>
-                    <div style="color: #888; padding: 0 10px;">→</div>
-                    <input type="text" class="form-control mapping-input" 
+                    <div class="mapping-field-label">
+                        <strong>${field.label}</strong>
+                        <small>Examples: ${field.example}</small>
+                    </div>
+                    <input type="text" 
+                           class="form-control mapping-input" 
                            data-source="${field.id}" 
-                           placeholder="${field.placeholder}"
-                           style="flex: 1;">
+                           placeholder="Enter their field name">
                 `;
                 container.appendChild(row);
             });
@@ -296,10 +335,36 @@
         function openAddModal() {
             initMappingFields();
             document.getElementById('addModal').classList.add('active');
+            goToStep1();
         }
 
         function closeModal() {
             document.getElementById('addModal').classList.remove('active');
+        }
+
+        function goToStep1() {
+            document.getElementById('modal-step-1').classList.remove('hidden');
+            document.getElementById('modal-step-2').classList.add('hidden');
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector('[data-step="1"]').classList.add('active');
+        }
+
+        function goToStep2() {
+            const name = document.getElementById('intName').value;
+            const url = document.getElementById('intUrl').value;
+            
+            if (!name || !url) {
+                alert('Please fill in both the name and webhook URL');
+                return;
+            }
+
+            document.getElementById('modal-step-1').classList.add('hidden');
+            document.getElementById('modal-step-2').classList.remove('hidden');
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.add('active');
+            });
         }
 
         function getFormData() {
@@ -393,49 +458,29 @@
             }
         }
 
-        // Close modal on outside click
-        document.getElementById('addModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
-        function toggleDetails(id) {
-            const el = document.getElementById('mapping-' + id);
-            el.classList.toggle('active');
-            const btn = event.target;
-            if (el.classList.contains('active')) {
-                btn.innerText = 'Hide Field Mapping ↑';
-            } else {
-                btn.innerText = 'View Field Mapping ↓';
-            }
+        function toggleIntegrationDetails(id) {
+            const panel = document.getElementById('details-' + id);
+            const icon = document.getElementById('toggle-icon-' + id);
+            panel.classList.toggle('active');
+            icon.textContent = panel.classList.contains('active') ? '👁️‍🗨️' : '👁️';
         }
 
         async function testIntegrationExisting(url, mappingStr) {
             const btn = event.target;
             const originalText = btn.innerText;
-            btn.innerText = '...';
+            btn.innerText = '⏳';
             btn.disabled = true;
 
             try {
-                // Parse the mapping string which is likely a JSON string from Jinja
-                // However, in the HTML attribute it might be a string representation of a dict
-                // Ideally we should pass the ID and let the backend handle it, OR parse it here.
-                // For simplicity, let's try to parse it if it's valid JSON, or just send a test ping.
-                
-                // Better approach: Create a specific endpoint for testing existing config by ID
-                // But since we don't have that, let's construct a dummy payload.
-                
                 let mapping = {};
                 try {
-                    // It comes as a string like "{'phone': 'caller_id'}" which isn't valid JSON (single quotes)
-                    // We might need to fix how it's passed in the template.
-                    // Let's replace single quotes with double quotes for a basic fix, though risky.
                     mapping = JSON.parse(mappingStr.replace(/'/g, '"'));
                 } catch (e) {
                     console.error("Could not parse mapping", e);
                 }
 
                 const data = {
-                    name: "Test from Dashboard",
+                    name: "Test",
                     url: url,
                     mapping: mapping
                 };
@@ -448,9 +493,9 @@
                 
                 const result = await res.json();
                 if (result.success) {
-                    alert(`✅ Success! Status: ${result.status_code}\nResponse: ${result.response}`);
+                    alert(`✅ Connection Successful!\n\nStatus: ${result.status_code}\nResponse: ${result.response}`);
                 } else {
-                    alert('❌ Failed: ' + result.error);
+                    alert('❌ Connection Failed:\n\n' + result.error);
                 }
             } catch (e) {
                 alert('Error: ' + e.message);
@@ -459,6 +504,11 @@
                 btn.disabled = false;
             }
         }
+
+        // Close modal on outside click
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
     </script>
 </body>
 </html>
