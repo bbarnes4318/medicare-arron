@@ -601,11 +601,12 @@ def trigger_webhooks(lead_data):
         
         if DATABASE_URL and POSTGRES_AVAILABLE:
             c = conn.cursor(cursor_factory=RealDictCursor)
+            c.execute('SELECT * FROM webhook_configs WHERE enabled = TRUE')
         else:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
+            c.execute('SELECT * FROM webhook_configs WHERE enabled = 1')
             
-        c.execute('SELECT * FROM webhook_configs WHERE enabled = 1 OR enabled = TRUE')
         webhooks = c.fetchall()
         conn.close()
         
