@@ -29,12 +29,7 @@ def test_submission():
     
     # Fake lead data
     form_data = {
-        'state': 'CA',
-        'zip_code': '90210',
-        'first_name': 'Test',
-        'last_name': 'User',
         'phone': '(555) 123-4567',
-        'email': 'test@example.com',
         'disclosure': 'on',
         'trustedform_cert_url': 'https://cert.trustedform.com/0000000000000000000000000000000000000000' # Fake cert
     }

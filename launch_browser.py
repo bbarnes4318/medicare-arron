@@ -10,7 +10,7 @@ import tempfile
 # Configuration
 PROXY_HOST = "127.0.0.1"
 PROXY_PORT = 8888
-TARGET_URL = "https://lowinsurancecost.com"
+TARGET_URL = "https://buyertrend.org"
 
 def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

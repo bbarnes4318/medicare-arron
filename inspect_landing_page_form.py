@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-LANDING_PAGE_URL = 'https://lowinsurancecost.com'
+LANDING_PAGE_URL = 'https://buyertrend.org'
 
 def inspect_form():
     """Inspect the landing page form"""

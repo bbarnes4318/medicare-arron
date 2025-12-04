@@ -1,4 +1,4 @@
-// Content script to capture form data on lowinsurancecost.com
+// Content script to capture form data on buyertrend.org
 
 console.log("📋 Medicare Data Capture active");
 

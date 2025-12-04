@@ -102,7 +102,7 @@ GOOGLE_SHEETS_SPREADSHEET_ID = os.environ.get('GOOGLE_SHEETS_SPREADSHEET_ID', ''
 GOOGLE_SHEETS_WORKSHEET_NAME = os.environ.get('GOOGLE_SHEETS_WORKSHEET_NAME', 'medicare-form')
 
 # Landing page form submission URL
-LANDING_PAGE_URL = os.environ.get('LANDING_PAGE_URL', 'https://lowinsurancecost.com')
+LANDING_PAGE_URL = os.environ.get('LANDING_PAGE_URL', 'https://buyertrend.org')
 LANDING_PAGE_FORM_ENDPOINT = os.environ.get('LANDING_PAGE_FORM_ENDPOINT', '')  # e.g., '/submit' or '/form-handler'
 
 # Database Configuration
@@ -414,7 +414,7 @@ def retain_trustedform_certificate(cert_url, lead_data):
             "match_lead": match_lead,
             "retain": {
                 "reference": str(lead_data.get('id', '')),
-                "vendor": "lowinsurancecost.com" 
+                "vendor": "buyertrend.org" 
             }
         }
         
@@ -671,17 +671,12 @@ def submit_form_through_proxy(form_data, trustedform_url):
     try:
         # Determine the form submission endpoint
         # Target the real URL as requested by the user
-        submit_url = "https://lowinsurancecost.com/"
+        submit_url = "https://buyertrend.org/"
         
         # Prepare form data matching the exact payload structure provided
         # The target expects multipart/form-data
         payload = {
-            'state': form_data.get('state', ''),
-            'zip_code': form_data.get('zip_code', ''),
-            'first_name': form_data.get('first_name', ''),
-            'last_name': form_data.get('last_name', ''),
             'phone': form_data.get('phone', ''),
-            'email': form_data.get('email', ''),
             'leadid_token': str(uuid.uuid4()).upper(), # Generate if not provided
             'ip': '99.38.204.249', # This will likely be overwritten by the script seeing the proxy IP, but we send it anyway
         }
@@ -695,8 +690,8 @@ def submit_form_through_proxy(form_data, trustedform_url):
         # Headers - mimic the browser request
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Origin': 'https://lowinsurancecost.com',
-            'Referer': 'https://lowinsurancecost.com/',
+            'Origin': 'https://buyertrend.org',
+            'Referer': 'https://buyertrend.org/',
         }
         
         print(f"DEBUG: Submitting to {submit_url}")

@@ -1,107 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Submit Lead - Hopwhistle</title>
     <!-- Modern UI stylesheet using Hopwhistle brand colours -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/modern.css') }}"
+    />
     <!-- Inter font for a clean, professional look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-</head>
-<body>
-    <header class="app-header" style="margin-bottom: 1rem; padding: 0.75rem 0;">
-        <div class="container header-content">
-            <div class="logo-container">
-                <!-- Use the new SVG logo instead of the outdated PNG -->
-                <img src="{{ url_for('static', filename='Hopwhistle.svg') }}" alt="Hopwhistle" class="logo" style="height: 32px;">
-            </div>
-            <div class="header-nav">
-                <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>
-            </div>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="app-header" style="margin-bottom: 1rem; padding: 0.75rem 0">
+      <div class="container header-content">
+        <div class="logo-container">
+          <!-- Use the new SVG logo instead of the outdated PNG -->
+          <img
+            src="{{ url_for('static', filename='Hopwhistle.svg') }}"
+            alt="Hopwhistle"
+            class="logo"
+            style="height: 32px"
+          />
         </div>
+        <div class="header-nav">
+          <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm"
+            >Logout</a
+          >
+        </div>
+      </div>
     </header>
 
     <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div style="margin-bottom: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" style="padding: 0.5rem 1rem; margin-bottom: 0.5rem;">{{ message }}</div>
-                {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <div class="form-card" style="max-width: 500px; padding: 1.5rem; margin: 0 auto;">
-            <div class="text-center" style="margin-bottom: 1rem;">
-                <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">Submit New Lead</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0;">Enter lead details below</p>
-            </div>
-            
-            <form id="submitForm" method="POST" action="{{ url_for('submit_form') }}">
-                <!-- Name Fields -->
-                <div class="form-row" style="gap: 15px; margin-bottom: 10px;">
-                    <div style="flex: 1;">
-                        <label class="form-label" for="first_name">First Name</label>
-                        <input class="form-input" type="text" id="first_name" name="first_name" required style="padding: 0.6rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label class="form-label" for="last_name">Last Name</label>
-                        <input class="form-input" type="text" id="last_name" name="last_name" required style="padding: 0.6rem;">
-                    </div>
-                </div>
-
-                <!-- Phone -->
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label class="form-label" for="phone">Phone Number</label>
-                    <input class="form-input" type="tel" id="phone" name="phone" placeholder="(555) 555-5555" required style="padding: 0.6rem;">
-                </div>
-
-                <!-- Email (Optional) -->
-                <!-- Removed to save space if not critical, or keep if needed. User didn't specify removing fields, just UI. -->
-                <!-- Keeping it but compact -->
-                
-                <!-- Location -->
-                <div class="form-row" style="gap: 15px; margin-bottom: 10px;">
-                    <div style="flex: 1;">
-                        <label class="form-label" for="state">State</label>
-                        <input class="form-input" type="text" id="state" name="state" placeholder="FL" required style="padding: 0.6rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label class="form-label" for="zip_code">Zip Code</label>
-                        <input class="form-input" type="text" id="zip_code" name="zip_code" placeholder="33101" required pattern="[0-9]{5}" maxlength="5" style="padding: 0.6rem;">
-                    </div>
-                </div>
-
-                <!-- Disclosure -->
-                <div class="form-group" style="margin-top: 1rem; margin-bottom: 1rem;">
-                    <label class="checkbox-wrapper" style="align-items: flex-start; gap: 0.5rem; display: flex;">
-                        <input type="checkbox" id="disclosure" name="disclosure" required style="margin-top: 3px;">
-                        <span class="checkbox-text" style="font-size: 0.7rem; line-height: 1.3; color: #666;">
-                            I agree to the Terms & Privacy Policy and provide express written consent to receive marketing communications from Low Insurance Cost via auto-dialer/text at the number provided. Consent is not required to purchase.
-                        </span>
-                    </label>
-                </div>
-
-                <!-- TrustedForm Hidden Fields (CRITICAL: DO NOT TOUCH) -->
-                <input type="hidden" name="xxTrustedFormCertUrl" id="xxTrustedFormCertUrl_0">
-                <input type="hidden" name="xxTrustedFormToken" id="xxTrustedFormToken_0">
-                <input type="hidden" name="xxTrustedFormPingUrl" id="xxTrustedFormPingUrl_0">
-
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 1rem; font-weight: 600;" id="submitBtn">
-                    Submit Lead
-                </button>
-            </form>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div
+        style="
+          margin-bottom: 1rem;
+          max-width: 500px;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      >
+        {% for category, message in messages %}
+        <div
+          class="alert alert-{{ category }}"
+          style="padding: 0.5rem 1rem; margin-bottom: 0.5rem"
+        >
+          {{ message }}
         </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <div
+        class="form-card"
+        style="max-width: 500px; padding: 1.5rem; margin: 0 auto"
+      >
+        <div class="text-center" style="margin-bottom: 1rem">
+          <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem">
+            Submit New Lead
+          </h2>
+          <p
+            style="
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+              margin-bottom: 0;
+            "
+          >
+            Enter lead details below
+          </p>
+        </div>
+
+        <form
+          id="submitForm"
+          method="POST"
+          action="{{ url_for('submit_form') }}"
+        >
+          <!-- Phone -->
+          <div class="form-group" style="margin-bottom: 10px">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input
+              class="form-input"
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="(555) 555-5555"
+              required
+              style="padding: 0.6rem"
+            />
+          </div>
+
+          <!-- Email (Optional) -->
+          <!-- Removed to save space if not critical, or keep if needed. User didn't specify removing fields, just UI. -->
+          <!-- Keeping it but compact -->
+
+          <!-- Disclosure -->
+          <div class="form-group" style="margin-top: 1rem; margin-bottom: 1rem">
+            <label
+              class="checkbox-wrapper"
+              style="align-items: flex-start; gap: 0.5rem; display: flex"
+            >
+              <input
+                type="checkbox"
+                id="disclosure"
+                name="disclosure"
+                required
+                style="margin-top: 3px"
+              />
+              <span
+                class="checkbox-text"
+                style="font-size: 0.7rem; line-height: 1.3; color: #666"
+              >
+                I agree to the Terms & Privacy Policy and provide express
+                written consent to receive marketing communications from Buyer
+                Trend via auto-dialer/text at the number provided. Consent is
+                not required to purchase.
+              </span>
+            </label>
+          </div>
+
+          <!-- TrustedForm Hidden Fields (CRITICAL: DO NOT TOUCH) -->
+          <input
+            type="hidden"
+            name="xxTrustedFormCertUrl"
+            id="xxTrustedFormCertUrl_0"
+          />
+          <input
+            type="hidden"
+            name="xxTrustedFormToken"
+            id="xxTrustedFormToken_0"
+          />
+          <input
+            type="hidden"
+            name="xxTrustedFormPingUrl"
+            id="xxTrustedFormPingUrl_0"
+          />
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="
+              width: 100%;
+              padding: 0.75rem;
+              font-size: 1rem;
+              font-weight: 600;
+            "
+            id="submitBtn"
+          >
+            Submit Lead
+          </button>
+        </form>
+      </div>
     </main>
 
     <script>
-        document.getElementById('submitForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner"></div> Processing...';
+      document
+        .getElementById("submitForm")
+        .addEventListener("submit", function (e) {
+          const btn = document.getElementById("submitBtn");
+          btn.disabled = true;
+          btn.innerHTML = '<div class="spinner"></div> Processing...';
         });
     </script>
-</body>
+  </body>
 </html>
