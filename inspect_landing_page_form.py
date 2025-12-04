@@ -126,7 +126,7 @@ if __name__ == '__main__':
         print("BeautifulSoup4 is required for this script.")
         print("Install it with: pip install beautifulsoup4")
         print("\nAlternatively, manually inspect the form:")
-        print("1. Visit https://lowinsurancecost.com")
+        print("1. Visit https://buyertrend.org")
         print("2. Right-click the form > Inspect")
         print("3. Look for the <form> tag's 'action' attribute")
         print("4. Check all <input> tags for 'name' attributes")

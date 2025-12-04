@@ -1039,7 +1039,7 @@ def submit_lead_via_browser(form_data):
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # 1. Go to Landing Page
-        target_url = "https://lowinsurancecost.com/"
+        target_url = "https://buyertrend.org/"
         print(f"🌐 Navigating to {target_url}...")
         driver.get(target_url)
         print(f"DEBUG: Page Title: {driver.title}")

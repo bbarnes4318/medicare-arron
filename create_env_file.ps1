@@ -8,7 +8,7 @@ GOOGLE_SHEETS_SPREADSHEET_ID=1l48px8Sj9JiqbfW8aLgMeWMMGAVYQFjbKnZWZkVmDCE
 GOOGLE_SHEETS_WORKSHEET_NAME=medicare-form
 
 # Landing Page Configuration
-LANDING_PAGE_URL=https://lowinsurancecost.com
+LANDING_PAGE_URL=https://buyertrend.org
 LANDING_PAGE_FORM_ENDPOINT=
 
 # Proxy Configuration (for local testing)

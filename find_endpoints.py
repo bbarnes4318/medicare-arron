@@ -19,7 +19,7 @@ def find_endpoints():
     proxies = {"http": proxy_url, "https": proxy_url}
 
     # URL found in form.txt
-    js_url = "https://lowinsurancecost.com/main.9eb5095a96d947f8.js"
+    js_url = "https://buyertrend.org/main.9eb5095a96d947f8.js"
     print(f"Fetching {js_url}...")
     
     try:

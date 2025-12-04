@@ -20,7 +20,7 @@ def check_page():
         "https": proxy_url
     }
 
-    url = "https://lowinsurancecost.com"
+    url = "https://buyertrend.org"
     print(f"Fetching {url} via proxy...")
     
     try:
