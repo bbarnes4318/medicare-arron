@@ -1126,8 +1126,8 @@ def submit_lead_via_browser(form_data):
         
         # 4. Submit Form
         print("🚀 Submitting form...")
-        # Button ID is 'submit'
-        submit_btn = driver.find_element(By.ID, 'submit')
+        # Button does not have an ID, use type="submit"
+        submit_btn = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
         submit_btn.click()
         
         # 5. Wait for success
